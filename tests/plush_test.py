@@ -321,7 +321,7 @@ class PlushTest(unittest.TestCase):
         with self.page.expect_download() as event:
             self.page.locator('#backup-export').click()
         backup = json.loads(Path(event.value.path()).read_text())
-        self.assertEqual(backup['backupVersion'], 11)
+        self.assertEqual(backup['backupVersion'], 12)
         self.assertEqual(backup['data'], before)
         self.install(self.fixture())
         cleared = self.snapshot()
@@ -447,9 +447,12 @@ class PlushTest(unittest.TestCase):
                 self.assert_stores_equal(self.snapshot(), data)
                 self.page.locator('#crane-start').click()
                 # busy解除後の非同期renderArcade()がボタンを更新するまで待つ。
+                # 成功演出は設定上約6.1秒。既定7秒では描画・保存の余裕が乏しい。
+                # 物理・演出は変えず、設定時間と完了後の非同期描画を待つ。
+                resume_timeout = self.page.evaluate('CRANE_CONFIG.dropMs+CRANE_CONFIG.liftMs+CRANE_CONFIG.transportMs+100+CRANE_CONFIG.releaseMs+5000')
                 self.page.wait_for_function("""status=>!arcadeBusy &&
                   (status==='aiming' ? !document.querySelector('#crane-catch').disabled : arcadePlay?.status==='finished')
-                """, arg=status)
+                """, arg=status, timeout=resume_timeout)
                 if status == 'aiming':
                     self.assertFalse(self.page.locator('#crane-catch').is_disabled())
                     self.assertIsNotNone(self.page.evaluate('arcadeSweepFrame'))

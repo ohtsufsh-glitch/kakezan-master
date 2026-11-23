@@ -179,7 +179,7 @@ class RunnerPhase2ACompatibilityTest(unittest.TestCase):
     def test_version2_paid_s04_pause_resume_finish_history_scores_and_profiles(self):
         self.assertTrue(self.page.evaluate("""async inputs=>{
           await installPhase();const before=await snapshotAllStores(),p=await buyLegacy({stageId:'S04'});
-          if(p.stageVersion!==2||!runnerCanResume(p)||p.snapshot.version!==2||DB_VERSION!==11||BACKUP_VERSION!==11)throw Error('versions');
+          if(p.stageVersion!==2||!runnerCanResume(p)||p.snapshot.version!==2||DB_VERSION!==12||BACKUP_VERSION!==12)throw Error('versions');
           let c=await openRunnerSession('student',p.id,{lifecycle:false});await c.resume();let n=0;const saved=new Set();
           while(c.view.state.mode==='running'){
             const s=c.view.state;
