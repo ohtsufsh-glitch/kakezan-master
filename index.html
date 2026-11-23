@@ -96,6 +96,7 @@
     .testtag { background: #fef0d8; color: #7d5209; }
     /* 長文・会話文：JSONの改行を維持しつつ、狭い画面でも文字がはみ出さない */
     .question { font-size: 1.15rem; font-weight: 700; line-height: 1.8; margin: 14px 0 18px; white-space: pre-wrap; overflow-wrap:anywhere; line-break:strict; }
+    #quiz #question-text { display:grid; place-items:center; min-height:1.6em; font-size:clamp(2.5rem, 10vw, 4rem); line-height:1.25; text-align:center; white-space:nowrap; overflow-wrap:normal; }
     .question.long-reading { font-size: 1.05rem; font-weight: 500; line-height: 1.95; padding: 16px; border-radius: 14px; border: 1px solid #d6e5ef; background: #f7fafc; margin-top: 16px; }
     .choice .choice-text { flex:1; min-width:0; white-space:pre-wrap; overflow-wrap:anywhere; line-break:strict; line-height:1.7; font-size:1rem; }
     .result p { white-space:pre-wrap; overflow-wrap:anywhere; line-break:strict; line-height:1.8; }
@@ -1036,7 +1037,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.4.1";
+const APP_VERSION = "v0.4.2";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],
@@ -4681,7 +4682,7 @@ function renderQuestion() {
   $("study-progress").textContent=inSet ? `${studyLabel(currentSession.mode,currentSession.genre)} ｜ ${currentSession.position+1} / ${currentSession.entries.length}問` : "";
   $("next").textContent=inSet&&currentSession.position===currentSession.entries.length-1 ? "つぎへ（セット結果）" : "つぎへ";
   $("question-kind").textContent="すうじでこたえてね ｜ 基礎";
-  $("question-text").textContent=q.q;
+  $("question-text").textContent=`${q.left} × ${q.right}`;
   $("result").classList.add("hidden");$("next").classList.add("hidden");
   const choices=$("choices");choices.replaceChildren();
   const display=document.createElement("output");display.id="numeric-answer";display.setAttribute("aria-label","こたえ");display.setAttribute("aria-live","polite");choices.append(display);
