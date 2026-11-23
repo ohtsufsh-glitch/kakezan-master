@@ -4,7 +4,7 @@
 
 - 開始時のGitHub main：`68916109e584db434c3d74e04974c544bb77c0f5`、v0.4.3。PR #8マージ済み、open Issue／PRなし。新Issueは作成しない。
 - 作業ブランチ：`codex/admin-order-collapsed-report`。候補版v0.4.4。
-- 実行コードの差分は `index.html` の管理画面HTMLとAPP_VERSIONだけ。「動作確認」のブロックを先頭へ移動し、`details#learning-report` の `open` を削除。
+- 実行コードの差分は `index.html` の管理画面HTML、通算正答率のselectの最小高さCSS 1行、APP_VERSIONだけ。「動作確認」のブロックを先頭へ移動し、`details#learning-report` の `open` を削除。
 - 説明文と「テストモードを開始（問題・クレーン）」ボタン、回答履歴、バックアップ・復元、その他の管理は保持。
 - `renderLearningReport()` は親detailsの開閉状態を変更しないため、toggleイベントを含めJavaScriptの調整なし。同じページ内の再描画・画面往復でもユーザーの選択を保持する。新たな開閉状態の永続保存は追加しない。
 - 学習問題・報酬・カード・クレーン・ランナー・保存形式の変更なし。DB `kakezan-master-v1` schema12、backup `kakezan-master-backup` v12、17ストアを維持。`runner/**`、`assets/**` の差分なし。
@@ -29,6 +29,8 @@ Python 3.12.14、Playwright 1.62.0、Chromium 156.0.8078.79（Linux）、Node.js
 表示は320×568、568×320、375×667、667×375、390×844、844×390、768×1024、1024×768、820×1180、1180×820、507×768、320×1024の12サイズ。文字100%／CSS200%・閉鎖／展開の48条件で順序、横はみ出しなし、対象ボタン・見出し・selectの44px以上を確認する。
 
 既存の `progress_cards_test`、`mobile_regression_test`、`quiz_prompt_test` は見出しを明示的に開いてから検査する。既存assertは削除せず、通算25件（正解5件、20%）の全○×履歴、同率のID順、未回答末尾、段別9件、両プロフィール、81問の検査を維持する。版検査の期待値だけv0.4.4に更新。新テストはApp isolationのCI対象へ追加する。
+
+CI初回は追加レイアウト試験の文字100%・展開時12条件で44px判定が不合格（他の順序・横幅検査は合格）。既存のselectスタイルに最小高さがなかったため、`#learning-report select { min-height:44px; }` を1行追加して明示する。44pxのassertや既存の検査は弱めない。CIと同じChrome 151.0.7922.34でも追加4件＋既存の集計・履歴1件を再実行し、5件合格（13.602秒）。最終headのCI結果はPR本文に記録する。
 
 全リポジトリの全テスト合格を意味しない。過去工程の既知不合格と実機残件は [PR-4報告](PR4_REPORT.md) を参照。
 
