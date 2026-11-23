@@ -161,10 +161,10 @@ class RunnerRetireTest(unittest.TestCase):
         with self.page.expect_download() as download:
             self.page.evaluate('exportBackup()')
         data=json.loads(Path(download.value.path()).read_text())
-        self.assertEqual(data['backupVersion'],11)
+        self.assertEqual(data['backupVersion'],12)
         self.page.evaluate("async backup=>{await replaceAllStores(validateBackup(backup));}",data)
         self.page.reload();self.page.wait_for_function('appReady')
-        self.assertEqual(self.page.evaluate("async()=>{const d=await runnerLobbyData('student');return [d.active||null,d.records[0].result.reason,d.records[0].result.livesRemaining,d.records[0].score,Object.keys(d.summary.bestByStage).length,db.version,BACKUP_VERSION];}"),[None,'retire',2,0,0,11,11])
+        self.assertEqual(self.page.evaluate("async()=>{const d=await runnerLobbyData('student');return [d.active||null,d.records[0].result.reason,d.records[0].result.livesRemaining,d.records[0].score,Object.keys(d.summary.bestByStage).length,db.version,BACKUP_VERSION];}"),[None,'retire',2,0,0,12,12])
 
     def test_legacy_rejected_for_v10_export_restore_reload_and_old_app_rollback_limit(self):
         self.assertTrue(self.page.evaluate("""async()=>{

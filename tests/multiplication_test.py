@@ -167,7 +167,7 @@ class MultiplicationTest(unittest.TestCase):
         import json
         from pathlib import Path
         backup=json.loads(Path(event.value.path()).read_text())
-        self.assertEqual(backup['backupVersion'],11)
+        self.assertEqual(backup['backupVersion'],12)
         self.page.evaluate('x=>replaceAllStores(validateBackup(x))',backup)
         self.page.reload();self.ready()
         self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
@@ -186,7 +186,7 @@ class MultiplicationTest(unittest.TestCase):
         }""")
         before=self.page.evaluate('snapshotAllStores()')
         self.page.reload();self.ready()
-        self.assertEqual(self.page.evaluate('db.version'),11)
+        self.assertEqual(self.page.evaluate('db.version'),12)
         self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
 
     def test_mix_draft_and_result_resume_and_malformed_backup(self):

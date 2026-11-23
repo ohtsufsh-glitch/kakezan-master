@@ -38,7 +38,7 @@ class AppIsolationTest(unittest.TestCase):
           IDBFactory.prototype.open=function(name,...args){window.openedDatabases.push(name);return originalOpen.call(this,name,...args);};''')
         self.page.reload();self.page.wait_for_function('appReady')
         self.assertEqual(self.page.evaluate('openedDatabases'), ['kakezan-master-v1'])
-        self.assertEqual(self.page.evaluate('[DB_VERSION,BACKUP_VERSION,APP_VERSION,db.objectStoreNames.length]'),[11,11,'v0.2.0',17])
+        self.assertEqual(self.page.evaluate('[DB_VERSION,BACKUP_VERSION,APP_VERSION,db.objectStoreNames.length]'),[12,12,'v0.3.0',17])
         self.assertTrue(self.page.evaluate("async()=>Object.entries(await snapshotAllStores()).every(([k,v])=>['coinMeta','arcadeBoards'].includes(k)||v.length===0)"))
         self.page.evaluate(plush.FIXTURE_HELPERS)
         self.page.evaluate("async()=>plushInstall(plushFixture(['shiba'],'student'))")
@@ -62,7 +62,7 @@ class AppIsolationTest(unittest.TestCase):
         self.assertEqual(backup['data'],before)
         invalid=[]
         for version in range(1,11):invalid.append(dict(backup,backupFormat='history-master-backup',backupVersion=version))
-        for version in [0,*range(1,10),12]:invalid.append(dict(backup,backupVersion=version))
+        for version in [0,*range(1,10),13]:invalid.append(dict(backup,backupVersion=version))
         for store in before:
             broken=copy.deepcopy(backup);del broken['data'][store];invalid.append(broken)
         for obj in invalid:

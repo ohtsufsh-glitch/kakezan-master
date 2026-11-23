@@ -147,7 +147,7 @@ class RunnerStorageTest(unittest.TestCase):
             self.page.locator('#backup-export').click()
         from pathlib import Path
         backup=json.loads(Path(event.value.path()).read_text())
-        self.assertEqual(backup['backupVersion'],11)
+        self.assertEqual(backup['backupVersion'],12)
         self.assertEqual(backup['data'],before)
         self.page.locator('#backup-file').set_input_files({'name':'synthetic-v10.json','mimeType':'application/json','buffer':json.dumps(backup).encode()})
         self.page.wait_for_function("$('backup-preview').textContent.startsWith('検査OK')")
