@@ -1,0 +1,328 @@
+"""v1.6.6のUI回帰テスト。実行方法はquestion_editor_test.pyと同じ。
+
+localhostと一時ブラウザ、既存テストの公開可能な合成データだけを使用する。
+"""
+
+import functools
+import http.server
+import os
+import re
+import shutil
+import threading
+import unittest
+
+from playwright.sync_api import sync_playwright
+
+from plush_test import FIXTURE_HELPERS, ROOT, QuietHandler
+
+
+TEST_NOTE = '🔧 テストモード：コインを消費せず何回でも遊べます。景品と履歴はテスト用に保存されます。'
+
+
+class UiCleanupTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.server = http.server.ThreadingHTTPServer(
+            ('127.0.0.1', 0), functools.partial(QuietHandler, directory=str(ROOT)))
+        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread.start()
+        cls.playwright = sync_playwright().start()
+        executable = os.environ.get('KAKEZAN_MASTER_BROWSER') or shutil.which('chromium')
+        cls.browser = cls.playwright.chromium.launch(executable_path=executable)
+        cls.url = f'http://127.0.0.1:{cls.server.server_port}/index.html'
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close()
+        cls.playwright.stop()
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.thread.join()
+
+    def setUp(self):
+        self.context = self.browser.new_context(
+            viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
+        self.page = self.context.new_page()
+        self.page.set_default_timeout(5000)
+        self.errors = []
+        self.page.on('pageerror', lambda error: self.errors.append(str(error)))
+        self.page.on('console', lambda message: self.errors.append(message.text) if message.type == 'error' else None)
+        self.page.on('dialog', lambda dialog: dialog.accept())
+        self.page.route('**/favicon.ico', lambda route: route.fulfill(status=204))
+        self.page.goto(self.url)
+        self.ready()
+
+    def ready(self):
+        self.page.wait_for_function("(typeof appReady==='undefined'?document.querySelectorAll('#era-list button').length===10:appReady)")
+
+    def tearDown(self):
+        self.context.close()
+        self.assertEqual(self.errors, [])
+
+    def assert_header(self, mode):
+        self.assertEqual(self.page.locator('#header-coins, #header-coin-amount').count(), 0)
+        label = self.page.locator('#header-mode')
+        self.assertEqual(label.count(), 1)
+        self.assertTrue(label.is_visible())
+        self.assertEqual(label.text_content(), mode)
+        self.assertEqual(self.page.locator('#open-admin').count(), 1)
+        # 管理画面では管理ボタン自体を隠す既存の切替仕様を維持する。
+        self.assertEqual(self.page.locator('#open-admin').is_visible(), mode != '🔧 保護者用')
+        self.assertTrue(self.page.evaluate("""()=>{
+          const elements=['header h1','#header-mode','#open-admin'].map(s=>document.querySelector(s));
+          const [title,mode,admin]=elements.map(el=>el.getBoundingClientRect());
+          const adminVisible=!elements[2].classList.contains('hidden');
+          const fits=elements.filter(el=>!el.classList.contains('hidden')).every(el=>{
+            const r=el.getBoundingClientRect(), range=document.createRange();
+            range.selectNodeContents(el);
+            const text=range.getBoundingClientRect();
+            return r.width>0&&r.left>=0&&r.right<=innerWidth&&el.scrollWidth<=el.clientWidth&&
+              text.left>=r.left&&text.right<=r.right&&text.top>=r.top&&text.bottom<=r.bottom&&
+              text.height<2*parseFloat(getComputedStyle(el).fontSize);
+          });
+          const firstRow=!adminVisible||(title.left<admin.left&&title.right<=admin.left&&
+            title.top<admin.bottom&&admin.top<title.bottom);
+          const modeRow=innerWidth<=430
+            ? mode.top>=Math.max(title.bottom,admin.bottom)&&Math.abs(mode.left-title.left)<1
+            : mode.left>=title.right&&mode.top<title.bottom&&title.top<mode.bottom&&
+              (!adminVisible||(mode.right<=admin.left&&mode.top<admin.bottom&&admin.top<mode.bottom));
+          return fits&&firstRow&&modeRow&&(!adminVisible||(admin.width>=44&&admin.height>=44))&&
+            document.documentElement.scrollWidth<=innerWidth;
+        }"""))
+
+    def assert_student_note_removed(self):
+        note = self.page.locator('#arcade-profile-note')
+        self.assertFalse(note.is_visible())
+        self.assertEqual(note.text_content(), '')
+        self.assertEqual(note.evaluate('el=>el.getBoundingClientRect().height'), 0)
+
+    def test_version_is_admin_only_and_follows_the_constant(self):
+        before = self.page.evaluate('snapshotAllStores()')
+        self.assertFalse(self.page.locator('#app-version').is_visible())
+        self.assertNotIn('アプリバージョン', self.page.locator('#home').inner_text())
+        self.assertEqual(self.page.locator('#home #app-version').count(), 0)
+        self.page.locator('#open-admin').click()
+        version = self.page.locator('#app-version')
+        self.assertTrue(version.is_visible())
+        self.assertRegex(self.page.evaluate('APP_VERSION'), r'^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$')
+        self.assertEqual(version.inner_text(), 'アプリバージョン：' + self.page.evaluate('APP_VERSION'))
+        self.assertEqual(version.evaluate('el=>el.previousElementSibling.textContent'), '⚙️ 保護者用管理画面')
+        self.assertEqual(self.page.evaluate('[DB_NAME,DB_VERSION,BACKUP_VERSION]'),
+                         ['kakezan-master-v1', 10, 10])
+        self.assertEqual(self.page.evaluate('snapshotAllStores()'), before)
+        # 定数だけを変えた将来のリリースでも、表示に追従することを確認。
+        source, count = re.subn(r'(const APP_VERSION\s*=\s*)["\'][^"\']+["\']',
+                                lambda match: match[1] + '"v9.9.9"',
+                                (ROOT / 'index.html').read_text(), count=1)
+        self.assertEqual(count, 1)
+        self.page.route(self.url, lambda route: route.fulfill(body=source, content_type='text/html'))
+        self.page.reload()
+        self.ready()
+        # 履歴にある管理画面をリロード後も復元する。
+        self.assertTrue(self.page.locator('#admin').is_visible())
+        self.assertEqual(self.page.locator('#app-version').inner_text(), 'アプリバージョン：v9.9.9')
+        self.assertEqual(self.page.evaluate('snapshotAllStores()'), before)
+
+    def test_coin_displays_and_notes_follow_profile_and_screen_changes(self):
+        self.page.evaluate(FIXTURE_HELPERS)
+        self.page.evaluate('async()=>{await plushInstall(plushFixture());await renderHome();}')
+        self.assert_header('📖 学習用')
+        self.assertTrue(self.page.locator('#open-admin').is_visible())
+        self.assertTrue(self.page.locator('#home-coins').is_visible())
+        self.assertEqual(self.page.locator('#home-coin-amount').inner_text(), '805枚')
+        self.page.locator('#open-arcade').click()
+        self.page.wait_for_function("document.querySelector('#arcade-balance').textContent==='805枚'")
+        self.assert_header('📖 学習用')
+        self.assert_student_note_removed()
+        self.assertEqual(self.page.locator('#arcade-hint').inner_text(), '途中で閉じても続きから再開できます。')
+        self.page.locator('#crane-start').click()
+        self.page.wait_for_function("arcadePlay?.status==='aiming'&&!arcadeBusy")
+        self.assertEqual(self.page.locator('#arcade-balance').inner_text(), '705枚')
+        self.assertEqual(self.page.locator('#home-coin-amount').text_content(), '705枚')
+        self.page.locator('#arcade-back').click()
+        self.page.wait_for_function("!document.querySelector('#home').classList.contains('hidden')")
+        student = self.page.evaluate('snapshotAllStores()')
+        self.page.locator('#open-admin').click()
+        self.assert_header('🔧 保護者用')
+        self.page.locator('#admin-start-test').click()
+        self.page.wait_for_function("profile==='test'&&!document.querySelector('#home').classList.contains('hidden')")
+        self.assert_header('🔧 テスト中')
+        self.assertEqual(self.page.locator('#home-coin-amount').inner_text(), '9枚')
+        self.page.locator('#open-arcade').click()
+        self.page.wait_for_function("document.querySelector('#arcade-balance').textContent==='∞（無料）'")
+        self.assertTrue(self.page.locator('#arcade-profile-note').is_visible())
+        self.assertEqual(self.page.locator('#arcade-profile-note').inner_text(), TEST_NOTE)
+        self.page.locator('#crane-start').click()
+        self.page.wait_for_function("arcadePlay?.profile==='test'&&arcadePlay.status==='aiming'&&!arcadeBusy")
+        self.assertEqual(self.page.evaluate("getAvailableCoins('test')"), 9)
+        self.page.locator('#open-admin').click()
+        self.assert_header('🔧 保護者用')
+        self.page.locator('#admin-back').click()
+        self.page.wait_for_function("profile==='student'&&!document.querySelector('#home').classList.contains('hidden')")
+        self.assert_header('📖 学習用')
+        self.assertEqual(self.page.locator('#home-coin-amount').inner_text(), '705枚')
+        self.page.locator('#open-arcade').click()
+        self.page.wait_for_function("document.querySelector('#arcade-balance').textContent==='705枚'")
+        self.assert_student_note_removed()
+        self.assertIsNone(self.page.evaluate('arcadeSweepFrame'))
+        after = self.page.evaluate('snapshotAllStores()')
+        for store in student:
+            self.assertEqual([r for r in after[store] if r.get('profile') == 'student'],
+                             [r for r in student[store] if r.get('profile') == 'student'], store)
+
+    def test_dashboard_overall_above_radar_without_stretching_on_ipad(self):
+        """The overall summary sits above the radar, while genres remain to the right on iPad."""
+        before = self.page.evaluate('snapshotAllStores()')
+        for width, height in [(390, 844), (740, 1024), (768, 1024), (1024, 768), (1180, 820)]:
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': height})
+                result = self.page.evaluate("""() => {
+                  const grid=document.querySelector('.dashboard-grid');
+                  const left=document.querySelector('.radar-column');
+                  const overall=document.querySelector('#overall-mastery');
+                  const radar=document.querySelector('.radar-shell');
+                  const genre=document.querySelector('#genre-dashboard');
+                  const svg=document.querySelector('#radar-chart svg');
+                  const rect=el=>el.getBoundingClientRect();
+                  const l=rect(left),a=rect(overall),b=rect(radar),c=rect(genre),d=rect(svg);
+                  return {
+                    correctParents:overall.parentElement===left&&radar.parentElement===left&&genre.parentElement===grid,
+                    above:a.bottom<=b.top,
+                    layout:innerWidth>740
+                      ? c.left>=l.right&&Math.abs(c.top-l.top)<2
+                      : c.top>=b.bottom,
+                    naturalHeight:getComputedStyle(grid).alignItems==='start',
+                    radarProportions:Math.abs(d.width/d.height-520/480)<0.04,
+                    noOverflow:document.documentElement.scrollWidth<=innerWidth
+                  };
+                }""")
+                self.assertTrue(all(result.values()), (width, result))
+        self.assertEqual(self.page.evaluate('snapshotAllStores()'), before)
+
+    def test_layout_at_iphone_and_ipad_sizes(self):
+        for width, height in [(375, 812), (390, 844), (430, 932), (431, 920),
+                              (768, 1024), (1024, 768), (1180, 820)]:
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': height})
+                self.page.evaluate('returnToStudentHome()')
+                self.assert_header('📖 学習用')
+                self.page.locator('#open-admin').click()
+                version = self.page.locator('#app-version')
+                self.assertTrue(version.is_visible())
+                self.assertTrue(version.evaluate("""el=>{
+                  const r=el.getBoundingClientRect(), size=parseFloat(getComputedStyle(el).fontSize);
+                  return r.left>=0&&r.right<=innerWidth&&size>=12&&size<=16;
+                }"""))
+                self.page.locator('#admin-start-test').click()
+                self.page.wait_for_function("profile==='test'&&!document.querySelector('#home').classList.contains('hidden')")
+                self.page.locator('#open-arcade').click()
+                self.page.wait_for_function("!document.querySelector('#arcade-profile-note').classList.contains('hidden')")
+                self.assertEqual(self.page.locator('#arcade-profile-note').inner_text(), TEST_NOTE)
+                self.assertTrue(self.page.evaluate("""()=>{
+                  const selectors=['#open-admin','#arcade-profile-note','#arcade-balance','#arcade-hint','#header-mode'];
+                  return document.documentElement.scrollWidth<=innerWidth&&selectors.every(selector=>{
+                    const r=document.querySelector(selector)?.getBoundingClientRect();
+                    return r&&r.width>0&&r.left>=0&&r.right<=innerWidth;
+                  });
+                }"""))
+
+
+    def test_mode_indicator_badges_have_aa_contrast_and_fit_header(self):
+        """Issue #25: 管理・テストのハイライトが淡色文字に上書きされない。"""
+        for width, height in [(375, 812), (390, 844), (430, 932), (431, 920),
+                              (768, 1024), (1024, 768), (1180, 820)]:
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': height})
+                self.page.evaluate('returnToStudentHome()')
+                self.assert_header('📖 学習用')
+                self.page.locator('#open-admin').click()
+                self.assert_header('🔧 保護者用')
+                self.assert_mode_badge_legible()
+                self.page.locator('#admin-start-test').click()
+                self.page.wait_for_function("profile==='test'&&!document.querySelector('#home').classList.contains('hidden')")
+                self.assert_header('🔧 テスト中')
+                self.assert_mode_badge_legible()
+                self.page.locator('#open-admin').click()
+                self.assert_header('🔧 保護者用')
+                self.assert_mode_badge_legible()
+                self.page.locator('#admin-back').click()
+                self.page.wait_for_function("profile==='student'&&!document.querySelector('#home').classList.contains('hidden')")
+                self.assert_header('📖 学習用')
+                self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
+
+    def assert_mode_badge_legible(self):
+        badge = self.page.locator('#header-mode')
+        self.assertTrue(badge.is_visible())
+        result = badge.evaluate("""el=>{
+          const css=getComputedStyle(el),parse=val=>(val.match(/[0-9.]+/g)||[]).slice(0,3).map(Number);
+          const luminosity=rgb=>rgb.map(v=>{
+            v/=255;return v<=0.04045?v/12.92:((v+0.055)/1.055)**2.4;
+          }).reduce((sum,value,i)=>sum+value*[0.2126,0.7152,0.0722][i],0);
+          const l1=luminosity(parse(css.color)),l2=luminosity(parse(css.backgroundColor));
+          const ratio=(Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05);
+          const r=el.getBoundingClientRect();
+          return {ratio,color:css.color,background:css.backgroundColor,
+            fits:r.left>=0&&r.right<=innerWidth&&r.width>0,nowrap:css.whiteSpace==='nowrap'};
+        }""")
+        self.assertGreaterEqual(result['ratio'], 4.5, result)
+        self.assertTrue(result['fits'], result)
+        self.assertTrue(result['nowrap'], result)
+
+    def test_learning_mode_icon_consistent_in_quiz_and_reloads(self):
+        """Issue #25: 初期HTMLと動的表示で性別のない学習アイコンに統一。"""
+        self.page.set_viewport_size({'width': 768, 'height': 1024})
+        self.assert_header('📖 学習用')
+        self.page.evaluate("startEra('E01')")
+        self.page.wait_for_function("quizReady&&!document.querySelector('#quiz').classList.contains('hidden')")
+        self.assert_header('📖 学習用')
+        self.assertEqual(self.page.locator('#quiz-status').text_content(), '📖 学習用')
+        self.assertNotIn('👧', self.page.locator('#header-mode').text_content())
+        before = self.page.evaluate('snapshotAllStores()')
+        self.page.go_back()
+        self.page.wait_for_function("!document.querySelector('#home').classList.contains('hidden')")
+        self.assert_header('📖 学習用')
+        self.page.go_forward()
+        self.page.wait_for_function("quizReady&&!document.querySelector('#quiz').classList.contains('hidden')")
+        self.assert_header('📖 学習用')
+        self.assertEqual(self.page.locator('#quiz-status').text_content(), '📖 学習用')
+        self.page.reload()
+        self.ready()
+        self.assert_header('📖 学習用')
+        self.assertEqual(self.page.locator('#quiz-status').text_content(), '📖 学習用')
+        self.page.locator('#open-admin').click()
+        self.assert_header('🔧 保護者用')
+        self.page.reload()
+        self.ready()
+        self.assert_header('🔧 保護者用')
+        self.assert_mode_badge_legible()
+        self.page.locator('#admin-start-test').click()
+        self.page.wait_for_function("profile==='test'&&!document.querySelector('#home').classList.contains('hidden')")
+        self.assert_header('🔧 テスト中')
+        self.page.reload()
+        self.ready()
+        self.assert_header('🔧 テスト中')
+        self.assert_mode_badge_legible()
+        self.page.locator('#open-admin').click()
+        self.assert_header('🔧 保護者用')
+        self.page.go_back()
+        self.page.wait_for_function("profile==='test'&&!document.querySelector('#home').classList.contains('hidden')")
+        self.assert_header('🔧 テスト中')
+        self.assert_mode_badge_legible()
+        self.page.go_forward()
+        self.page.wait_for_function("!document.querySelector('#admin').classList.contains('hidden')")
+        self.assert_header('🔧 保護者用')
+        self.assert_mode_badge_legible()
+        self.page.locator('#admin-back').click()
+        self.page.wait_for_function("profile==='student'&&!document.querySelector('#home').classList.contains('hidden')")
+        self.assert_header('📖 学習用')
+        self.page.go_back()
+        self.page.wait_for_function("!document.querySelector('#admin').classList.contains('hidden')")
+        self.assert_header('🔧 保護者用')
+        self.page.go_forward()
+        self.page.wait_for_function("profile==='student'&&!document.querySelector('#home').classList.contains('hidden')")
+        self.assert_header('📖 学習用')
+        self.assertEqual(self.page.evaluate('snapshotAllStores()'), before)
+
+
+if __name__ == '__main__':
+    unittest.main()

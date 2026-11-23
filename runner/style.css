@@ -1,0 +1,301 @@
+:root {
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  color: #263f3b;
+  background: #eef6f1;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top, #fffdf3, #eef6f1 70%);
+}
+
+.runner-app {
+  width: min(100%, 1120px);
+  height: 100vh;
+  height: 100dvh;
+  margin: 0 auto;
+  padding: 16px;
+  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.runner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.runner-eyebrow { margin: 0 0 3px; color: #536d62; font-size: .75rem; font-weight: 700; }
+h1 { margin: 0; font-size: clamp(1.2rem, 3vw, 1.65rem); line-height: 1.3; }
+.runner-badge { flex-shrink: 0; padding: 6px 12px; border-radius: 999px; background: #deebe2; color: #415c50; font-size: .8rem; font-weight: 700; }
+
+.runner-app-preview { grid-template-rows: auto auto auto minmax(120px, 1fr) auto; }
+.runner-preview[hidden] { display: none; }
+.runner-preview { min-width: 0; padding: 8px 12px; border: 1px solid #a8c7b2; border-radius: 14px; background: #fffdf3; }
+.runner-preview p { margin: 4px 0 0; font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.runner-preview .runner-preview-notice { margin: 0 0 6px; font-weight: 800; color: #2d6453; }
+.runner-stage-choice { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.runner-stage-choice label { flex-shrink: 0; font-size: .85rem; font-weight: 700; }
+#runner-stage-select, #runner-character-select { min-width: 0; width: 100%; min-height: 44px; padding: 8px; border: 1px solid #688b78; border-radius: 8px; background: #fff; color: #263f3b; font: inherit; font-size: 1rem; touch-action: manipulation; }
+#runner-stage-select:disabled, #runner-character-select:disabled { color: #53675e; background: #e1e9de; opacity: 1; }
+#runner-stage-select:focus-visible, #runner-character-select:focus-visible { outline: 3px solid #e39b40; outline-offset: 2px; }
+.runner-character-choice { margin-top: 6px; }
+.runner-character-summary { display: flex; align-items: center; gap: 8px; min-width: 0; }
+#runner-character-image { flex: none; object-fit: contain; }
+.runner-stage-choice label[for="runner-character-select"] { width: 6em; white-space: normal; }
+
+.runner-hud {
+  display: flex;
+  justify-content: center;
+  gap: clamp(12px, 4vw, 48px);
+  margin: 0;
+  padding: 8px 16px;
+  border: 1px solid #d4e3d8;
+  border-radius: 14px;
+  background: #ffffffbd;
+}
+
+.runner-hud > div { display: flex; align-items: baseline; gap: 10px; }
+.runner-hud dt { font-size: .8rem; color: #53675e; }
+.runner-hud dd { margin: 0; font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.runner-hud dd .runner-unit { margin-left: 3px; font-size: .85rem; font-weight: 600; }
+
+.runner-viewport {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+.runner-stage {
+  position: relative;
+  flex: none;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 18px;
+  outline: 1px solid #31574824;
+  box-shadow: 0 8px 24px #254a3c15;
+  background: #d8efed;
+}
+
+#runner-canvas { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
+.runner-stage[hidden], .runner-status[hidden], .runner-result[hidden] { display: none; }
+/* Safe Area内に収まるゲーム枠を基準に固定。タップは下のCanvasへ通す。 */
+.runner-lives { position: absolute; z-index: 1; top: 6px; left: 6px; padding: 3px 8px; border-radius: 10px; background: #ffffffd9; color: #bd2649; font-family: Arial, sans-serif; font-size: clamp(20px, 3vw, 28px); line-height: 1.15; letter-spacing: 2px; white-space: nowrap; pointer-events: none; user-select: none; -webkit-user-select: none; }
+.runner-status { position: absolute; inset: 0; display: grid; place-content: center; margin: 0; padding: 16px; text-align: center; font-size: .9rem; line-height: 1.6; background: #eef6f1; }
+.runner-result { position: absolute; z-index: 1; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(340px, calc(100% - 24px)); max-height: calc(100% - 16px); overflow: auto; padding: 18px; border: 2px solid #6d9b77; border-radius: 18px; background: #fffdf3f5; box-shadow: 0 8px 24px #254a3c30; text-align: center; }
+.runner-result h2 { margin: 0; font-size: 1.35rem; line-height: 1.3; }
+.runner-result p { margin: 8px 0 0; font-size: .85rem; line-height: 1.5; }
+.runner-result .runner-result-score { font-size: 1rem; }
+#runner-result-score { margin-inline: 6px 3px; font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.runner-footer { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.runner-controls { display: flex; flex-direction: column; align-items: stretch; gap: 12px; width: min(100%, 440px); flex: 0 0 auto; }
+.runner-jump { width: 100%; min-height: 62px; flex-shrink: 0; padding: 8px 16px; border: 0; border-radius: 18px; background: linear-gradient(#e7a9ba,#c86c89); color: #fff; text-shadow: 0 1px 2px #9e506a; box-shadow: 0 5px 0 #896c6a,0 9px 13px #654a5340; font: inherit; font-size: 1.5rem; font-weight: 900; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.runner-jump:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #896c6a; }
+.runner-jump:focus-visible { outline: 3px solid #e39b40; outline-offset: 3px; }
+.runner-jump:disabled { opacity: .55; cursor: not-allowed; }
+.runner-start { min-width: 180px; min-height: 48px; padding: 10px 18px; border: 1px solid #2d6453; border-radius: 12px; color: #fff; background: #346f5c; font: inherit; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.runner-start:focus-visible { outline: 3px solid #e39b40; outline-offset: 3px; }
+.runner-start:disabled { color: #5c6d60; background: #e1e9de; opacity: 1; cursor: not-allowed; }
+
+@media (max-width: 480px) {
+  .runner-stage-choice { flex-direction: column; align-items: stretch; gap: 4px; }
+  .runner-hud { gap: 12px; justify-content: space-around; padding-inline: 8px; }
+  .runner-hud > div { flex-direction: column; align-items: center; gap: 2px; }
+  .runner-footer { flex-direction: column; gap: 10px; text-align: center; }
+  .runner-controls, .runner-start { width: 100%; }
+  .runner-app-preview { gap: 8px; }
+  .runner-app-preview .runner-stage-choice { flex-direction: row; align-items: center; gap: 6px; }
+  .runner-app-preview .runner-controls { gap: 8px; }
+  .runner-app-preview .runner-jump, .runner-app-preview .runner-start { width: 100%; min-width: 0; min-height: 58px; padding: 8px; font-size: 1rem; }
+}
+
+@media (max-width: 640px) {
+  .runner-jump { min-height: 58px; }
+}
+
+@media (max-height: 500px) and (min-width: 481px),
+       (min-width: 700px) and (max-height: 900px) {
+  /* 子iframeの可用サイズで判定する。広くても縦積みが収まらない高さでは左右配置へ。
+     親が幅920pxまでなので、大きなタブレット横画面でも子は幅846pxになる。 */
+  .runner-app { grid-template-columns: minmax(0, 1fr) clamp(240px, 32vw, 300px); grid-template-rows: auto auto minmax(0, 1fr); gap: 6px 16px; padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+  .runner-header { grid-column: 1 / -1; }
+  .runner-viewport { grid-column: 1; grid-row: 2 / 4; }
+  .runner-hud { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 5px 6px; }
+  .runner-hud > div { flex-direction: column; align-items: center; gap: 2px; }
+  .runner-hud dt { font-size: .72rem; }
+  .runner-footer { grid-column: 2; grid-row: 3; flex-direction: column; justify-content: center; gap: 8px; text-align: center; }
+  .runner-controls { width: 100%; }
+  .runner-eyebrow { display: none; }
+  h1 { font-size: 1.2rem; }
+  .runner-hud dd { font-size: 1.3rem; }
+  .runner-stage { border-radius: 12px; }
+  .runner-result { padding: 10px 16px; border-radius: 12px; }
+  .runner-result h2 { font-size: 1.15rem; }
+  .runner-result p { margin-top: 5px; }
+  .runner-app-preview { grid-template-rows: auto auto auto minmax(120px, 1fr); gap: 4px 16px; }
+  .runner-app-preview .runner-preview { grid-column: 1 / -1; grid-row: 2; padding: 4px 10px; }
+  .runner-app-preview .runner-viewport { grid-row: 3 / 5; }
+  .runner-app-preview .runner-hud { grid-row: 3; }
+  .runner-app-preview .runner-footer { grid-row: 4; }
+  .runner-app-preview .runner-preview-notice { margin-bottom: 2px; }
+  .runner-app-preview .runner-preview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2px 12px; }
+  .runner-app-preview .runner-preview[hidden] { display: none; }
+  .runner-app-preview .runner-preview-notice, .runner-app-preview #runner-stage-help { grid-column: 1 / -1; }
+  .runner-app-preview .runner-preview > .runner-stage-choice { grid-column: 1; grid-row: 2; }
+  .runner-app-preview #runner-stage-details { grid-column: 1; grid-row: 3; }
+  .runner-app-preview .runner-character-choice { grid-column: 2; grid-row: 2 / 4; margin-top: 0; }
+  .runner-app-preview .runner-stage-choice { flex-direction: row; align-items: center; gap: 4px; }
+  .runner-app-preview .runner-stage-choice label { font-size: .75rem; }
+  .runner-app-preview .runner-character-summary { gap: 4px; }
+  .runner-app-preview #runner-character-image { width: 36px; height: 36px; }
+  .runner-app-preview .runner-controls { flex-direction: row; gap: 8px; }
+  .runner-app-preview .runner-jump, .runner-app-preview .runner-start {
+    width: calc(50% - 4px); min-width: 0; min-height: 48px; padding: 8px 4px; font-size: 1rem;
+  }
+}
+
+/* 大きな文字や拡大表示では、内容を切らずに縦スクロールを許可する。 */
+@media (max-height: 260px) {
+  .runner-app { height: auto; min-height: 100vh; min-height: 100dvh; grid-template-rows: auto auto minmax(120px, 1fr) auto; }
+}
+
+/* iPhone縦: 文字拡大でもゲーム枠を潰さず、必要な高さはスクロールで確保する。 */
+@media (max-width: 480px) and (orientation: portrait) {
+  .runner-app { height: auto; min-height: 100vh; min-height: 100dvh;
+    grid-template-rows: auto auto minmax(160px, 1fr) auto; }
+  .runner-app-preview { grid-template-rows: auto auto auto minmax(160px, 1fr) auto; }
+  .runner-controls { flex-direction: column; }
+  .runner-jump, .runner-start { width: 100%; min-width: 0; overflow-wrap: anywhere; }
+}
+
+/* 正式画面はCanvasの実寸で積む。余ったiframe高さをゲーム枠へ配らない。 */
+.runner-app-formal {
+  height:auto; min-height:100vh; min-height:100dvh;
+  grid-template-rows:auto auto auto auto; align-content:start;
+}
+.runner-app-formal .runner-badge { min-width:7.5em; text-align:center; }
+.runner-app-formal .runner-header > div { min-width:0; }
+.runner-app-formal .runner-viewport {
+  display:grid; min-height:0;
+  align-items:stretch; justify-content:stretch;
+}
+/* 比率用のセルと結果を重ね、文字拡大では結果の必要高を優先する。 */
+.runner-app-formal .runner-viewport::before { content:""; grid-area:1 / 1; padding-top:56.25%; }
+.runner-app-formal .runner-stage { position:absolute; align-self:center; justify-self:center; }
+/* 同じgridセルに重ねる。拡大文字はパネルを自然に伸ばし、documentで読める。 */
+.runner-app-formal .runner-result {
+  grid-area:1 / 1; position:relative; inset:auto; transform:none;
+  width:100%; max-height:none; overflow:visible; padding:8px;
+  display:flex; flex-direction:column; justify-content:center; background:#fffdf3;
+}
+.runner-app-formal .runner-result[hidden] { display:none; }
+.runner-app-formal .runner-result h2 { font-size:1.2rem; }
+.runner-app-formal .runner-result p { margin-top:4px; line-height:1.4; }
+.runner-app-formal .runner-result p:empty { display:none; }
+.runner-app-formal .runner-result-progress { display:none; }
+.runner-app-formal .runner-footer { flex-direction:column; gap:12px; text-align:center; }
+.runner-app-formal .runner-controls { width:100%; }
+.runner-app-formal .runner-status {
+  position:static; width:100%; margin:0; padding:4px;
+  font-size:.75rem; line-height:1.4;
+}
+.runner-app-formal .runner-status[hidden] { display:none; }
+.runner-result[data-reason="gameover"] { border-color:#a96853; }
+.runner-record { color:#835000; font-weight:800; }
+@media (max-height:500px) and (min-width:481px),
+       (min-width:700px) and (max-height:900px) {
+  /* HUDの行を内容高に固定し、保存通知やボタン文言で操作の上端を動かさない。 */
+  .runner-app-formal { grid-template-rows:auto max-content minmax(min-content, 1fr); }
+  .runner-app-formal .runner-viewport { align-self:start; }
+  /* 低い横画面は親のstickyヘッダーを避ける余裕も確保。論理座標は変えない。 */
+  .runner-app-formal .runner-viewport::before {
+    padding-top:min(56.25%, max(10rem, calc(100dvh - 6.5rem)));
+  }
+  .runner-app-formal .runner-footer { align-self:start; justify-content:flex-start; gap:8px; }
+  .runner-app-formal .runner-start {
+    min-width:0; width:100%; overflow-wrap:anywhere;
+    line-height:1.4; min-height:calc(2.8em + 22px);
+  }
+}
+
+/* 選択一覧は常に操作ボタンの下へ。文字拡大時も自然に縦へ伸びる。 */
+.runner-app-preview { height:auto; min-height:100dvh; grid-template-rows:auto auto auto auto auto; }
+.runner-app-preview .runner-preview { display:block; grid-column:1 / -1; grid-row:auto; }
+.runner-app-preview .runner-stage-choice { display:block; }
+.runner-app-preview .runner-stage-choice label { display:block; margin:8px 0; width:auto; }
+.runner-app-preview .runner-character-choice { margin-top:12px; }
+@media (max-height:500px) and (min-width:481px),
+       (min-width:700px) and (max-height:900px) {
+  .runner-app-preview { grid-template-rows:auto auto minmax(220px,auto) auto; }
+  .runner-app-preview .runner-viewport { grid-row:2 / 4; }
+  .runner-app-preview .runner-hud { grid-row:2; }
+  .runner-app-preview .runner-footer { grid-row:3; }
+  .runner-app-preview .runner-controls { flex-direction:column; }
+  .runner-app-preview .runner-jump, .runner-app-preview .runner-start { width:100%; }
+  .runner-app-preview .runner-preview { grid-row:4; }
+}
+
+/* iPad相当の可用幅: HUD → Canvas → 中央ジャンプ → 開始系。
+   iPhone横の二列・縦の12px間隔は既存ルールに任せる。 */
+@media (min-width:700px) and (min-height:501px) and (max-height:900px) {
+  .runner-app-formal {
+    grid-template-columns:minmax(0, 1fr);
+    grid-template-rows:auto auto auto auto;
+    gap:8px;
+  }
+  .runner-app-formal .runner-header { grid-column:1; grid-row:1; }
+  .runner-app-formal .runner-hud {
+    grid-column:1; grid-row:2; display:flex; padding:4px 12px;
+  }
+  .runner-app-formal .runner-hud > div { flex-direction:row; align-items:baseline; gap:8px; }
+  .runner-app-formal .runner-viewport {
+    grid-column:1; grid-row:3; width:100%;
+    max-width:calc(max(12rem, 100dvh - 18rem) * 16 / 9);
+    justify-self:center;
+  }
+  .runner-app-formal .runner-viewport::before { padding-top:56.25%; }
+  .runner-app-formal .runner-footer {
+    grid-column:1; grid-row:4; gap:8px;
+  }
+  .runner-app-formal .runner-controls { width:min(100%, 440px); gap:16px; }
+  .runner-app-formal .runner-jump { min-height:64px; }
+  .runner-app-formal .runner-start { min-height:48px; }
+  /* 通知3行と無料再開の文言を通常文字で確保。拡大文字は自然に伸ばす。 */
+  .runner-app-formal .runner-status { min-height:calc(3.5em + 8px); }
+  .runner-app-formal .runner-status[hidden] { display:block; visibility:hidden; }
+}
+
+/* 正式画面だけタイトルを視覚的に隠す。mainの名前の参照先は残す。 */
+.runner-app-formal #runner-title {
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); clip-path:inset(50%); white-space:nowrap; border:0;
+}
+
+/* ヘッダー内で場所を確保し、Canvas・ジャンプに重ねない。 */
+.runner-header-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+#runner-retire { min-width:44px; min-height:44px; padding:8px 12px; border:1px solid #a94b5a; border-radius:10px; color:#8b2438; background:#fffdf3; font:inherit; font-size:.85rem; font-weight:700; touch-action:manipulation; }
+#runner-retire[hidden] { display:none; }
+#runner-retire:disabled { opacity:.6; }
+#runner-retire:focus-visible { outline:3px solid #e39b40; outline-offset:2px; }
+/* 購入前・終了後も同じヘッダー寸法を保ち、操作中の配置変化を防ぐ。 */
+.runner-app-formal #runner-retire[hidden] { display:block; visibility:hidden; }
+.runner-app-formal .runner-header { flex-wrap:wrap; }
+.runner-app-formal .runner-header > div:first-child { flex:1 1 5rem; min-width:0; }
+.runner-header-actions { flex:0 0 auto; max-width:100%; }
+@media (min-width:700px) and (min-height:501px) and (max-height:900px) {
+  /* 44pxのヘッダー操作を追加した分だけ行間を詰め、Canvasの大きさを保つ。 */
+  .runner-app-formal { row-gap:3px; }
+}

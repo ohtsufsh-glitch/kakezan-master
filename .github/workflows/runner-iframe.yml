@@ -1,0 +1,102 @@
+name: Runner iframe layout
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'runner/**'
+      - 'tests/runner_phase1_test.py'
+      - 'tests/runner_phase2a_test.py'
+      - 'tests/runner_tuning_test.py'
+      - 'tests/runner_density_test.py'
+      - 'tests/runner_vertical_test.py'
+      - 'tests/runner_balance_test.py'
+      - 'tests/runner_crumbling_test.py'
+      - 'tests/fixtures/runner85-crumbling-base.json'
+      - 'tests/runner_balance_cases.py'
+      - 'tests/runner_fall_test.py'
+      - 'tests/fixtures/runner85-balance-base.json'
+      - 'tests/runner_ascent_test.py'
+      - 'tests/runner_ascent_cases.py'
+      - 'tests/fixtures/runner85-ascent-base.json'
+      - 'tests/runner_vertical_cases.py'
+      - 'tests/fixtures/runner85-vertical-base.json'
+      - 'tests/fixtures/runner85-variety-base.json'
+      - 'tests/fixtures/runner85-density-base.json'
+      - 'tests/fixtures/runner85-tuning-base.json'
+      - 'tests/fixtures/runner85-phase2a-base.json'
+      - 'tests/fixtures/runner85-v1.json'
+      - 'tests/runner_wall_design_test.py'
+      - 'tests/runner_difficulty_test.py'
+      - 'tests/runner_spike_design_test.py'
+      - 'tests/runner_canvas_test.py'
+      - 'tests/fixtures/runner137-spike-baseline.json'
+      - 'tests/runner_test_mode_test.py'
+      - 'tests/runner_retire_test.py'
+      - 'tests/runner_session_test.py'
+      - 'tests/runner_storage_test.py'
+      - 'tests/runner_integration_test.py'
+      - 'tests/runner_safari_test.py'
+      - 'tests/runner_animation_test.py'
+      - 'tests/runner_bear_test.py'
+      - 'tests/runner_layout_test.py'
+      - 'tests/runner_header_test.py'
+      - 'tests/home_arcade_test.py'
+      - 'tests/runner_records_ui_test.py'
+      - '.github/workflows/runner-iframe.yml'
+permissions:
+  contents: read
+jobs:
+  formal-iframe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Targeted formal runner tests
+        env:
+          PYTHONPATH: tests
+        run: |
+          python -m unittest -v \
+            runner_wall_design_test \
+            runner_difficulty_test.RunnerDifficultyTest.test_wall_rectangle_contacts_size_culling_and_no_landing \
+            runner_difficulty_test.RunnerDifficultyTest.test_wall_shield_auto_continue_and_fatal_goal_priority \
+            runner_difficulty_test.RunnerDifficultyTest.test_wall_canvas_matches_bounds_at_phone_tablet_sizes_without_images \
+            runner_spike_design_test \
+            runner_canvas_test.RunnerCanvasTest.test_spike_rock_image_loads_with_alpha_and_stays_grounded_in_phone_tablet_layouts \
+            runner_canvas_test.RunnerCanvasTest.test_missing_spike_rock_uses_fallback_and_preserves_motion_jump_collision_and_retry \
+            runner_test_mode_test \
+            runner_layout_test \
+            runner_header_test \
+            home_arcade_test.HomeArcadeTest \
+            runner_records_ui_test.RunnerRecordsUITest \
+            runner_animation_test \
+            runner_bear_test \
+            runner_integration_test.RunnerIntegrationTest.test_representative_touch_layout_and_single_engine \
+            runner_integration_test.RunnerIntegrationTest.test_home_formal_purchase_reload_resume_return \
+            runner_integration_test.RunnerIntegrationTest.test_formal_touch_result_and_manual_return \
+            runner_integration_test.RunnerIntegrationTest.test_home_top_and_bottom_entry_show_page_top \
+            runner_integration_test.RunnerIntegrationTest.test_home_entry_shows_top_then_preserves_user_scroll \
+            runner_safari_test.RunnerSafariTest.test_delayed_initial_frame_does_not_override_user_scroll \
+            runner_safari_test.RunnerSafariTest.test_history_traversal_does_not_apply_entry_scroll
+      - name: Retire confirmation and paid-play safety
+        env:
+          PYTHONPATH: tests
+        run: python -m unittest -v runner_retire_test
+      - name: Course physics and paid-play compatibility
+        env:
+          PYTHONPATH: tests
+        run: python -m unittest -v runner_phase1_test runner_phase2a_test runner_tuning_test runner_density_test runner_vertical_test runner_ascent_test runner_balance_test runner_crumbling_test runner_fall_test runner_session_test runner_storage_test
+      - name: Syntax and version checks
+        run: |
+          python -c "import re,pathlib; s=pathlib.Path('index.html').read_text(); pathlib.Path('/tmp/runner-parent.js').write_text(re.search(r'<script>([\s\S]*?)</script>',s)[1])"
+          node --check /tmp/runner-parent.js
+          node --input-type=module --check < runner/game.js
+          node --input-type=module --check < runner/stages.js
+          git diff --check HEAD^ HEAD
+          python scripts/check_app_version.py --base origin/main --head HEAD

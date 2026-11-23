@@ -2,7 +2,7 @@
 
 小学校低学年向けの、九九（1×1〜9×9）を楽しく練習する日本語Webアプリです。iPhone・iPadのSafariで使うことを想定し、既存の「歴史マスター」の学習・報酬・ミニゲームの仕組みをできるだけ活用します。
 
-> **開発準備中：** このリポジトリには現在、仕様書と開発ルールを整備する作業が進んでいます。九九学習アプリ本体はまだ移植・実装されていません。GitHub Pagesも未設定です。
+> **PR-1移植版 v0.1.0（未公開）：** 独立した保存領域と既存ゲームを移植しました。学習内容はまだ仮の歴史サンプル問題・選択肢UIです。九九学習はPR-2以降で実装します。
 
 ## 特長（実装予定・合意済みの仕様）
 
@@ -32,8 +32,8 @@
 
 | 段階 | 内容 | 状態 |
 |---|---|---|
-| PR-0 | 仕様書・開発ルールの整備 | 作業中（レビュー待ち） |
-| PR-1 | 参照元の移植・新アプリの独立化 | 未着手 |
+| PR-0 | 仕様書・開発ルールの整備 | mainマージ済み |
+| PR-1 | 参照元の移植・新アプリの独立化 | ドラフトレビュー対象 |
 | PR-2 | 九九81問、数字入力、学習モード | 未着手 |
 | PR-3 | 9段の進捗、10枚の達成カード、保護者の正答率表示 | 未着手 |
 | PR-4 | 総合回帰試験、iPhone・iPad Safari向け調整 | 未着手 |
@@ -42,4 +42,17 @@
 
 ## 開発・テストの現状
 
-2026年11月23日時点では、参照元GitHubコードの読み取り調査を実施済みです。本リポジトリの九九アプリは未実装であり、自動テスト・実機Safari確認・公開確認は未実施です。実装が始まった時点で、この節を最新の実態に合わせて更新します。
+移植基準は `4132cf78e29d2f33c4587b16b58e48f7ef3e17d9`（v1.7.56）。アプリ版v0.1.0、DB `kakezan-master-v1`（schema 10）、バックアップ `kakezan-master-backup`（version 10）。歴史版バックアップv1〜v10と新形式の旧版は受理しません。
+
+ローカル起動：`python3 -m http.server 8000` を実行し `http://localhost:8000/` を開きます。外部サービス不要。自動テストはPython 3.12、Node.js、Playwright、Chromiumを使用します。
+
+```sh
+python3 -m pip install -r requirements-dev.txt
+python3 -m playwright install chromium
+PYTHONPATH=tests python3 -m unittest -v app_isolation_test app_version_test runner_session_test runner_storage_test runner_integration_test runner_bear_test home_arcade_test
+python3 scripts/check_static.py
+```
+
+システムChromiumの指定には `KAKEZAN_MASTER_BROWSER` を使用できます。ブラウザ試験は一時コンテキストと架空データのみ使用します。生成画像は `/tmp/kakezan-review` 等に保存し、公開GitHubへ実利用データを入れません。
+
+コピー・変更・除外一覧は [移植マニフェスト](docs/PR1_FILES.md)、検証結果・Safari残件は [PR-1報告](docs/PR1_REPORT.md)、旧形式テストの変更理由は [テスト移植記録](docs/PR1_TEST_ADAPTATIONS.md) を参照してください。Pages公開・公開設定変更・マージは行っていません。
