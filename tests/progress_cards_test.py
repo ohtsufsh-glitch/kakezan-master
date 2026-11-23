@@ -147,6 +147,8 @@ class ProgressCardsTest(unittest.TestCase):
         }''')
         self.seed(count=1)
         self.page.evaluate('navigate("admin")')
+        self.page.locator('#learning-report > summary').click()
+        expect(self.page.locator('#learning-report')).to_have_js_property('open',True)
         self.assertEqual(self.page.locator('#report-list > section').count(),81)
         first=self.page.locator('#report-list > section').first
         self.assertIn('通算回答 25回 ／ 通算正解 5回 ／ 正答率 20% ／ 習得済み',first.inner_text())

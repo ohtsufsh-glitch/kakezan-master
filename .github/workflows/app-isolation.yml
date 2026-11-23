@@ -20,5 +20,5 @@ jobs:
           node-version: '22'
       - run: pip install -r requirements-dev.txt
       - run: python -m playwright install --with-deps chromium
-      - run: PYTHONPATH=tests python -m unittest -v progress_cards_test locked_card_test multiplication_test positive_coin_reward_test app_isolation_test app_version_test mobile_regression_test quiz_prompt_test table_coin_reward_test
+      - run: PYTHONPATH=tests python -m unittest -v progress_cards_test locked_card_test multiplication_test positive_coin_reward_test app_isolation_test app_version_test mobile_regression_test quiz_prompt_test table_coin_reward_test admin_report_test
       - run: python scripts/check_static.py

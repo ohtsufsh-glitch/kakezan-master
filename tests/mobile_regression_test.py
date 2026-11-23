@@ -47,6 +47,9 @@ class MobileRegressionTest(unittest.TestCase):
                 self.answer(False)
                 self.capture(f'result-{width}x{height}')
                 self.page.evaluate('navigate("admin")')
+                if not self.page.locator('#learning-report').evaluate('el=>el.open'):
+                    self.page.locator('#learning-report > summary').click()
+                expect(self.page.locator('#learning-report')).to_have_js_property('open', True)
                 expect(self.page.locator('#report-list > section')).to_have_count(81)
                 self.assertTrue(self.page.locator('#admin-questions-group').is_hidden())
                 self.capture(f'report-{width}x{height}')
@@ -83,6 +86,9 @@ class MobileRegressionTest(unittest.TestCase):
             self.page.evaluate('navigateHome()')
             self.capture(f'text200-home-{width}')
             self.page.evaluate('navigate("admin")')
+            if not self.page.locator('#learning-report').evaluate('el=>el.open'):
+                self.page.locator('#learning-report > summary').click()
+            expect(self.page.locator('#learning-report')).to_have_js_property('open', True)
             self.capture(f'text200-report-{width}')
             self.page.evaluate('startEra("T01")')
             self.page.wait_for_function('quizReady')
