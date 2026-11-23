@@ -60,7 +60,7 @@ class ProgressCardsTest(unittest.TestCase):
         self.question(8);self.answer()
         owned=self.awards();self.assertEqual([a['era'] for a in owned],['T01'])
         self.assertEqual(owned[0]['questionCountAtEarn'],9)
-        self.assertEqual(self.page.evaluate('getAvailableCoins()'),5) # card adds no coins
+        self.assertEqual(self.page.evaluate('getAvailableCoins()'),2) # card adds no coins
         self.question(8);self.answer(False)
         self.page.reload();self.ready()
         self.assertEqual(self.awards(),owned)

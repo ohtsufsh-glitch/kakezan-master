@@ -2,9 +2,9 @@
 
 小学校低学年向けの、九九（1×1〜9×9）を楽しく練習する日本語Webアプリです。iPhone・iPadのSafariで使うことを想定し、既存の「歴史マスター」の学習・報酬・ミニゲームの仕組みをできるだけ活用します。
 
-> **最新main（PR-4開始時）：** `1ed09dff5946ed48ef808a6d4cd3210a5396ba2d`、v0.4.0。GitHub PR #5はマージ済みで、承認済みの正式WebPカード10枚を実装済みです。公開ページの配信版は別途未確認です。
+> **今回の基準main：** `f770ad066bfba7e61bbe1b32f12735dff29a3f05`、v0.4.2（PR #7マージ済み）。
 >
-> **PR-4候補 v0.4.1：** 総合回帰・既知不具合の調査と実機確認手順を整備。文字拡大時のヘッダー折返しを修正しました。実機Safariは未確認です。[総合報告](docs/PR4_REPORT.md)・[55ファイルの分類](docs/PR4_TEST_INVENTORY.md)・[実機チェックシート](docs/SAFARI_DEVICE_CHECKLIST.md)を参照してください。
+> **候補 v0.4.3：** 正解1回のコインを段別に固定し、ホームの段カードに表示。旧残高・履歴を保持し、DB／バックアップ12・17ストアを維持。[段別報酬の検証報告](docs/TABLE_COIN_REWARDS_REPORT.md)。公開・実機Safari確認は別途です。
 
 ## 特長
 
@@ -13,7 +13,7 @@
 - 苦手優先の出題、2回連続正解での習得、習得済み問題の復習
 - 9段の進捗レーダーと総合理解度、81問別の通算正答率を保護者画面に表示
 - 段別9枚＋九九完全制覇1枚、合計10枚の達成カード
-- コイン、ぬいぐるみキャッチャー、わくわくランナー
+- 段別の正解報酬（1〜9の段：1/1/3/3/3/4/4/5/5枚）、ぬいぐるみキャッチャー、わくわくランナー
 - 保護者用テストモード、保存・再開、手動バックアップ・復元
 - 歴史マスターから完全に分離した保存データ
 
@@ -45,14 +45,14 @@
 
 ## 開発・テストの現状
 
-移植基準は `4132cf78e29d2f33c4587b16b58e48f7ef3e17d9`（v1.7.56）。mainはアプリ版v0.4.0、PR-4候補はv0.4.1。DB `kakezan-master-v1`（schema 12・17ストア）、バックアップ `kakezan-master-backup`（version 12）。新アプリの旧v10/v11バックアップは検証後に復元できます。歴史版の形式、v1〜9、未来版は拒否します。旧問題の履歴・コイン・ゲームは保持し、九九とは別IDで扱います。旧学習セッションは保存のみ継続し、九九として再開しません。v0.1.0/v0.2.0への直接ダウングレードはDB版のためできません。
+移植基準は `4132cf78e29d2f33c4587b16b58e48f7ef3e17d9`（v1.7.56）。基準mainはアプリ版v0.4.2、本候補はv0.4.3。DB `kakezan-master-v1`（schema 12・17ストア）、バックアップ `kakezan-master-backup`（version 12）。新アプリの旧v10/v11バックアップは検証後に復元できます。歴史版の形式、v1〜9、未来版は拒否します。旧問題の履歴・コイン・ゲームは保持し、九九とは別IDで扱います。旧学習セッションは保存のみ継続し、九九として再開しません。v0.1.0/v0.2.0への直接ダウングレードはDB版のためできません。
 
 ローカル起動：`python3 -m http.server 8000` を実行し `http://localhost:8000/` を開きます。外部サービス不要。自動テストはPython 3.12、Node.js、Playwright、Chromiumを使用します。
 
 ```sh
 python3 -m pip install -r requirements-dev.txt
 python3 -m playwright install chromium
-PYTHONPATH=tests python3 -m unittest -v progress_cards_test locked_card_test multiplication_test positive_coin_reward_test app_isolation_test app_version_test runner_session_test runner_storage_test runner_integration_test runner_bear_test home_arcade_test
+PYTHONPATH=tests python3 -m unittest -v progress_cards_test locked_card_test multiplication_test positive_coin_reward_test table_coin_reward_test app_isolation_test app_version_test runner_session_test runner_storage_test runner_integration_test runner_bear_test home_arcade_test
 python3 scripts/check_static.py
 ```
 
