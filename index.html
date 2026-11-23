@@ -183,26 +183,19 @@
     .trophy-open:focus-visible { outline:3px solid #286f9a; outline-offset:3px; }
     .trophy-open:active { transform:scale(.99); }
     .card-art { position:relative; aspect-ratio:3/4; width:100%; overflow:hidden; border-radius:9px; background:#f4ebd9; isolation:isolate; }
-    .card-art img { width:100%; height:100%; display:block; object-fit:cover; }
-    .card-art-top, .card-art-bottom { position:absolute; left:7%; width:86%; display:flex; align-items:center; justify-content:center; text-align:center; color:#5b3b22; font-weight:800; line-height:1.16; overflow-wrap:anywhere; text-shadow:0 1px 1px #fff8e4; pointer-events:none; }
-    .card-art-top { top:4.5%; height:9%; font-size:clamp(9px,2.8vw,13px); }
-    .card-art-bottom { bottom:5%; height:9%; font-size:clamp(10px,3.4vw,16px); }
+    .card-art img { width:100%; height:100%; display:block; object-fit:contain; }
     .card-art-fallback { display:none; position:absolute; inset:15%; align-items:center; justify-content:center; text-align:center; font-size:1.1rem; font-weight:700; color:#5b3b22; line-height:1.5; }
     .card-art.art-load-failed img { display:none; }
     .card-art.art-load-failed .card-art-fallback { display:flex; }
     .trophy .card-art { margin-bottom:8px; }
     .trophy-zoom { font-size:.76rem; color:#2a6d8a; margin-top:5px; }
     .award-banner .card-art { width:min(56%,185px); margin:6px auto 12px; }
-    .award-banner .card-art-top { font-size:clamp(11px,3vw,14px); }
-    .award-banner .card-art-bottom { font-size:clamp(13px,4vw,18px); }
     .award-see { border:1px solid #a77724; border-radius:12px; background:#fffdf4; color:#6d4a0f; font-weight:700; padding:10px 16px; margin-top:12px; min-height:44px; }
     .card-detail-dialog { width:min(94vw,480px); max-height:min(92dvh,900px); overflow-y:auto; border:1px solid #d8bd7a; border-radius:18px; padding:15px 16px 22px; background:#fffdf8; box-shadow:0 16px 50px #1d2d4099; color:#253244; text-align:center; }
     .card-detail-dialog::backdrop { background:rgba(10,19,34,.77); }
     .card-detail-close { display:block; margin:0 0 8px auto; border:1px solid #aab6c5; color:#253244; background:#fff; border-radius:10px; padding:8px 13px; min-height:44px; font-weight:700; }
-    .card-detail-dialog .card-art { width:min(100%,355px); margin:0 auto; }
-    .card-detail-dialog .card-art-top { font-size:clamp(14px,4vw,20px); }
-    .card-detail-dialog .card-art-bottom { font-size:clamp(16px,5vw,25px); }
-    .card-detail-dialog h2 { margin:14px 0 5px; }
+    .card-detail-dialog .card-art { width:min(100%,355px,calc((92dvh - 210px) * .75)); margin:0 auto; }
+    .card-detail-dialog h2 { margin:14px 0 5px; font-size:1.2rem; }
     .card-detail-dialog p { margin:5px 0; }
 
     .trophy { padding:15px 9px; border-radius:15px; min-width:0; border:1px solid #e5d7b6; background:linear-gradient(140deg,#fff9e8,#fff,#f8f4eb); text-align:center; }
@@ -744,7 +737,7 @@
 
     <div id="collection" class="home-panel collection-panel">
       <div class="panel-head"><div><span class="section-kicker">COLLECTION</span><h3>🏆 達成カード</h3></div><span id="card-total" class="rank-pill"></span></div>
-      <p class="achievement-note">その段の9問をぜんぶ習得すると段のカード、81問ぜんぶを同時に習得すると完全制覇カードがもらえるよ。もらったカードは間違えてもなくならないよ。10種類のキャラクター画像は制作待ちで、いまは仮表示です。</p>
+      <p class="achievement-note">その段の9問をぜんぶ習得すると段のカード、81問ぜんぶを同時に習得すると完全制覇カードがもらえるよ。もらったカードは間違えてもなくならないよ。獲得したカードはタップして大きく見られるよ。</p>
       <div id="card-gallery" class="trophy-grid"></div>
     </div>
   </section>
@@ -952,7 +945,7 @@
       <summary aria-controls="admin-other-content"><h3>⚙️ その他の管理<span class="muted small">データ初期化</span></h3></summary>
       <div id="admin-other-content" class="admin-group-content">
         <details id="card-preview-panel" class="genre-panel">
-          <summary>達成カードの仮表示を確認する（保護者用）</summary>
+          <summary>達成カードの画像を確認する（保護者用）</summary>
           <p class="muted small">10枚すべてをプレビューできます。ここで表示してもカードは獲得済みにならず、理解度・学習履歴も変わりません。</p>
           <div id="admin-card-preview" class="trophy-grid"></div>
         </details>
@@ -1014,7 +1007,7 @@
     <button id="finish-home" class="primary" type="button">ホームへ戻る</button>
   </section>
 </main>
-<dialog id="card-detail-dialog" class="card-detail-dialog" aria-labelledby="card-detail-title">
+<dialog id="card-detail-dialog" class="card-detail-dialog" aria-labelledby="card-detail-title" aria-describedby="card-detail-era card-detail-status">
   <button id="card-detail-close" class="card-detail-close" type="button">✕ 閉じる</button>
   <div id="card-detail-art-host"></div>
   <h2 id="card-detail-title"></h2>
@@ -1043,7 +1036,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.3.0";
+const APP_VERSION = "v0.4.0";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],
@@ -1869,7 +1862,7 @@ document.addEventListener("visibilitychange",()=>{
 });
 window.addEventListener("pagehide",()=>{closeFeedback();closePlushDetail(false);clearArcadeResult();if(!formalRunner)++viewGeneration;stopCraneSweep(true);arcadeResumeRequired=true;});
 
-// カードIDは旧E01〜E10と共存。名称は達成内容のみ（キャラクター設定は制作待ち）。
+// カードID・達成条件は維持し、承認済み画像だけを表示する。旧E01〜E10と共存。
 const LEGACY_CARD_MIN_QUESTIONS = 50;
 const RANKS = [
   {min:0, title:"れんしゅうスタート"},
@@ -1885,19 +1878,29 @@ const CARDS = Object.freeze(Object.fromEntries([
 ]));
 function cardArt(id,locked=false) {
   const frame=document.createElement("div");
-  frame.className="card-placeholder"+(locked?" is-locked":"");
-  frame.setAttribute("aria-hidden","true");
-  const icon=document.createElement("span");icon.className="trophy-icon";
-  icon.textContent=locked?"🔒":id==="ALL81"?"🏆":"✓";
-  const note=document.createElement("span");note.textContent="画像は制作待ち";
-  frame.append(icon,note);
+  frame.setAttribute("aria-hidden","true"); // カード名・段・状態は画像外のテキストで伝える。
+  if(locked) {
+    frame.className="card-placeholder is-locked";
+    const icon=document.createElement("span");icon.className="trophy-icon";icon.textContent="🔒";
+    const note=document.createElement("span");note.textContent="まだ獲得していません";
+    frame.append(icon,note);
+    return frame; // 未獲得の表面画像はDOMもURLも作らない。
+  }
+  frame.className="card-art";
+  const image=document.createElement("img");
+  image.alt="";image.width=1086;image.height=1448;
+  const fallback=document.createElement("span");fallback.className="card-art-fallback";
+  fallback.textContent=`${CARDS[id].name}（画像を読み込めませんでした）`;
+  image.addEventListener("error",()=>frame.classList.add("art-load-failed"));
+  image.src=`assets/cards/${id}.webp`;
+  frame.append(image,fallback);
   return frame;
 }
 function openCardDetail(id,preview=false) {
   const card=CARDS[id];
   $("card-detail-art-host").replaceChildren(cardArt(id));
   $("card-detail-title").textContent=card.name;
-  $("card-detail-era").textContent=`${card.label}の${card.count}問を同時に習得。キャラクター画像・名称・モチーフは制作待ちです。`;
+  $("card-detail-era").textContent=`${card.label}の${card.count}問を同時に習得。`;
   $("card-detail-status").textContent=preview?"保護者用プレビュー（獲得状況は変更されません）":"🏆 獲得済み";
   const dialog=$("card-detail-dialog");
   if(!dialog.open) dialog.showModal();
@@ -4133,6 +4136,13 @@ async function restoreRoute(target,{allowCreate=false}={}) {
   if(runnerRouteRequest!==runnerRouteGeneration)return;
   closeFeedback();
   closePlushDetail(false);
+  $("card-detail-dialog").close();
+  $("card-detail-art-host").replaceChildren();
+  document.querySelectorAll(".award-banner").forEach(banner=>banner.remove());
+  if(target.screen!=="admin") {
+    $("card-preview-panel").open=false;
+    $("admin-card-preview").replaceChildren();
+  }
   if(target.profile!==profile)clearArcadeResult();
   stopCraneSweep(true);
   arcadeResumeRequired=true;
@@ -5149,8 +5159,10 @@ $("study-home").addEventListener("click",()=>navigateHome().catch(err));
 $("study-again").addEventListener("click",()=>startStudy(currentSession.mode,currentSession.genre,true).catch(err));
 $("restart-study").addEventListener("click",()=>startStudy(currentSession.mode,currentSession.genre,true).catch(err));
 $("card-preview-panel").addEventListener("toggle",event=>{
-  if(event.target.open) renderAdminCardPreview();
+  if(event.target.open && !$("admin").classList.contains("hidden")) renderAdminCardPreview();
+  else $("admin-card-preview").replaceChildren();
 });
+$("card-detail-dialog").addEventListener("close", () => $("card-detail-art-host").replaceChildren());
 $("card-detail-close").addEventListener("click", () => $("card-detail-dialog").close());
 $("card-detail-dialog").addEventListener("click", event => {
   if(event.target === $("card-detail-dialog")) $("card-detail-dialog").close();
