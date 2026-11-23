@@ -301,7 +301,10 @@ class RunnerStagesTest(unittest.TestCase):
         page, errors, requests = self.model_runner()
         outcomes = page.evaluate("""()=>{
           const m=runnerModel,results=[];
+          // Damage feedback is intentionally different from the no-hit control.
+          // Compare motion/events here and verify feedback separately below.
           const checkpoint=s=>JSON.stringify({...s,lives:null,invincibleRemaining:null,
+            hitFeedbackRemaining:null,hitPoint:null,
             objects:s.objects.filter(o=>o.type!=='obstacle')});
           for(const phase of ['ground','ascending','descending','platform','landing'])for(const hz of [60,120]){
             const s=m.createRunnerState([{at:0,type:'star',height:120},
@@ -327,7 +330,9 @@ class RunnerStagesTest(unittest.TestCase):
             const after={mode:s.mode,lives:s.lives,score:s.score,support:s.supportId,
               airAction:s.airAction,shield:s.invincibleRemaining,preserved:checkpoint(s)===checkpoint(expected),
               uncollected:s.objects.some(o=>o.id==='future-star'),
-              collected:!s.objects.some(o=>o.id==='earned-now'),nextSpawn:s.nextSpawn};
+              collected:!s.objects.some(o=>o.id==='earned-now'),nextSpawn:s.nextSpawn,
+              feedback:s.hitFeedbackRemaining,hitPoint:s.hitPoint,
+              controlFeedback:expected.hitFeedbackRemaining,controlHitPoint:expected.hitPoint};
             const score=s.score;m.updateRunner(s,0);
             after.noDuplicate=s.score===score;results.push({phase,hz,...after});
           }
@@ -338,6 +343,9 @@ class RunnerStagesTest(unittest.TestCase):
                 self.assertEqual((row['mode'],row['lives'],row['score']), ('running',1,30))
                 self.assertAlmostEqual(row['shield'], 1-(1/row['hz']-1/120), delta=1e-9)
                 self.assertTrue(row['preserved'] and row['uncollected'] and row['collected'] and row['noDuplicate'])
+                self.assertAlmostEqual(row['feedback'], .24-(1/row['hz']-1/120), delta=1e-9)
+                self.assertTrue(all(isinstance(row['hitPoint'][k], (int, float)) for k in ['x','y','distance']))
+                self.assertEqual((row['controlFeedback'], row['controlHitPoint']), (0, None))
                 self.assertGreater(row['nextSpawn'], 0)
                 if row['phase'] in ('platform','landing'):
                     self.assertEqual(row['support'], 'support')

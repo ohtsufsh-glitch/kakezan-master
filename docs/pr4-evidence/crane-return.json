@@ -1,0 +1,218 @@
+[
+  {
+    "width": 375,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 375,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 390,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0.10000000000582077
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 390,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 430,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 430,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0.10000000000582077
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 640,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 640,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0.10000000000582077
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 641,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 641,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 759,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 759,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0.10000000000582077
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 760,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 760,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 768,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 768,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 1024,
+    "prize": "star",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0.09999999997671694
+    },
+    "savedStoresUnchanged": true
+  },
+  {
+    "width": 1024,
+    "prize": "secret_koryun",
+    "returnOpacity": "0",
+    "returnAnimations": [],
+    "settled": {
+      "opacity": "0",
+      "animations": 0,
+      "elapsed": 0.09999999997671694
+    },
+    "savedStoresUnchanged": true
+  }
+]

@@ -571,7 +571,7 @@ class SecretPlushTest(unittest.TestCase):
         with self.page.expect_download() as event:
             self.page.locator('#backup-export').click()
         backup = json.loads(Path(event.value.path()).read_text())
-        self.assertEqual(backup['backupVersion'], 10)
+        self.assertEqual(backup['backupVersion'], 12)
         self.assertEqual(backup['data'], before)
         self.page.evaluate('async()=>{await plushInstall(plushFixture());}')
         self.page.locator('#backup-file').set_input_files({
@@ -632,7 +632,8 @@ class SecretPlushTest(unittest.TestCase):
         with self.page.expect_download() as event:
             self.page.locator('#backup-export').click()
         backup = json.loads(Path(event.value.path()).read_text())
-        self.assertEqual((backup['backupVersion'], self.page.evaluate('DB_VERSION')), (10, 10))
+        # Current format/schema; the v7 name is retained for test provenance.
+        self.assertEqual((backup['backupVersion'], self.page.evaluate('DB_VERSION')), (12, 12))
         self.assertEqual(backup['data'], before)
         self.assertNotIn('secret_unknown', json.dumps(backup))
         self.page.evaluate('async()=>{await plushInstall(plushFixture());}')

@@ -160,7 +160,7 @@ class PlushTest(unittest.TestCase):
         })""")
         self.assertEqual(actual['types'], TYPES)
         self.assertEqual(actual['ids'], IDS)
-        self.assertEqual((actual['db'], actual['backup']), (10, 10))
+        self.assertEqual((actual['db'], actual['backup']), (12, 12))
         for prize_id, image in zip(IDS, actual['images']):
             self.assertEqual(image['path'], f'assets/plush/{prize_id}.webp')
             self.assertGreater(image['width'], 0)

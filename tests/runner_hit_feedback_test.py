@@ -58,13 +58,13 @@ class RunnerHitFeedbackTest(unittest.TestCase):
             for reduced in (False,True):
                 with self.subTest(character=character,reduced=reduced):
                     page,errors,requests=self.preview_runner()
-                    page.evaluate("""()=>{
+                    page.evaluate("""character=>{
                       window.hitDraw={};
                       const p=CanvasRenderingContext2D.prototype;
                       const set=p.setTransform,draw=p.drawImage,arc=p.arc;
                       p.setTransform=function(...args){hitDraw={};return set.apply(this,args)};
                       p.drawImage=function(img,x,y,w,h){
-                        if(img.src.includes('/plush/')||img.src.includes('/shiba/')){
+                        if(img.src.includes('/plush/')||img.src.includes('/runner/assets/'+character+'/')){
                           const t=this.getTransform().transformPoint({x:x+w/2,y});
                           hitDraw.x=t.x*960/this.canvas.width;
                         }
@@ -75,9 +75,9 @@ class RunnerHitFeedbackTest(unittest.TestCase):
                         if(this.strokeStyle==='#bd5425')hitDraw.impact=r;
                         return arc.call(this,x,y,r,...args);
                       };
-                    }""")
+                    }""", character)
                     page.emulate_media(reduced_motion='reduce' if reduced else 'no-preference')
-                    page.locator('#runner-character-select').select_option(character)
+                    page.locator(f'#runner-character-cards [data-choice="{character}"]').click()
                     page.wait_for_function('runnerImages.every(i=>i.complete)', polling=10)
                     self.settle(page)
                     self.toggle(page)

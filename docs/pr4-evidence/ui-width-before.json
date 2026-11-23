@@ -1,0 +1,77 @@
+[
+  {
+    "name": "dynamic-dialog-664",
+    "viewportWidth": 390,
+    "scrollWidth": 390
+  },
+  {
+    "name": "dynamic-dialog-844",
+    "viewportWidth": 390,
+    "scrollWidth": 390
+  },
+  {
+    "name": "dynamic-dialog-600",
+    "viewportWidth": 390,
+    "scrollWidth": 390
+  },
+  {
+    "name": "text200-home-320",
+    "viewportWidth": 320,
+    "scrollWidth": 360
+  },
+  {
+    "name": "text200-report-320",
+    "viewportWidth": 320,
+    "scrollWidth": 360
+  },
+  {
+    "name": "text200-quiz-320",
+    "viewportWidth": 320,
+    "scrollWidth": 360
+  },
+  {
+    "name": "text200-home-667",
+    "viewportWidth": 667,
+    "scrollWidth": 667
+  },
+  {
+    "name": "text200-report-667",
+    "viewportWidth": 667,
+    "scrollWidth": 667
+  },
+  {
+    "name": "text200-quiz-667",
+    "viewportWidth": 667,
+    "scrollWidth": 667
+  },
+  {
+    "name": "text200-home-507",
+    "viewportWidth": 507,
+    "scrollWidth": 507
+  },
+  {
+    "name": "text200-report-507",
+    "viewportWidth": 507,
+    "scrollWidth": 507
+  },
+  {
+    "name": "text200-quiz-507",
+    "viewportWidth": 507,
+    "scrollWidth": 507
+  },
+  {
+    "name": "text200-home-1024",
+    "viewportWidth": 1024,
+    "scrollWidth": 1024
+  },
+  {
+    "name": "text200-report-1024",
+    "viewportWidth": 1024,
+    "scrollWidth": 1024
+  },
+  {
+    "name": "text200-quiz-1024",
+    "viewportWidth": 1024,
+    "scrollWidth": 1024
+  }
+]

@@ -1,0 +1,222 @@
+[
+  {
+    "phase": "ground",
+    "hz": 60,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": "ground",
+    "airAction": null,
+    "shield": 0.9916666666666667,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 1,
+    "noDuplicate": true
+  },
+  {
+    "phase": "ground",
+    "hz": 120,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": "ground",
+    "airAction": null,
+    "shield": 1,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 1,
+    "noDuplicate": true
+  },
+  {
+    "phase": "ascending",
+    "hz": 60,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": null,
+    "airAction": "jump",
+    "shield": 0.9916666666666667,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 2,
+    "noDuplicate": true
+  },
+  {
+    "phase": "ascending",
+    "hz": 120,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": null,
+    "airAction": "jump",
+    "shield": 1,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 1,
+    "noDuplicate": true
+  },
+  {
+    "phase": "descending",
+    "hz": 60,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": null,
+    "airAction": "jump",
+    "shield": 0.9916666666666667,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 2,
+    "noDuplicate": true
+  },
+  {
+    "phase": "descending",
+    "hz": 120,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": null,
+    "airAction": "jump",
+    "shield": 1,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 2,
+    "noDuplicate": true
+  },
+  {
+    "phase": "platform",
+    "hz": 60,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": "support",
+    "airAction": null,
+    "shield": 0.9916666666666667,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 1,
+    "noDuplicate": true
+  },
+  {
+    "phase": "platform",
+    "hz": 120,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": "support",
+    "airAction": null,
+    "shield": 1,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 1,
+    "noDuplicate": true
+  },
+  {
+    "phase": "landing",
+    "hz": 60,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": "support",
+    "airAction": null,
+    "shield": 0.9916666666666667,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 1,
+    "noDuplicate": true
+  },
+  {
+    "phase": "landing",
+    "hz": 120,
+    "mode": "running",
+    "lives": 1,
+    "score": 30,
+    "support": "support",
+    "airAction": null,
+    "shield": 1,
+    "preserved": false,
+    "diff": [
+      "hitFeedbackRemaining",
+      "hitPoint",
+      "lives",
+      "invincibleRemaining",
+      "objects"
+    ],
+    "uncollected": true,
+    "collected": true,
+    "nextSpawn": 1,
+    "noDuplicate": true
+  }
+]

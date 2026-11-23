@@ -235,7 +235,7 @@
     @media(min-width:640px) { .trophy-grid {grid-template-columns:repeat(3,minmax(0,1fr));} }
     @media (max-width: 430px) {
       header { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
-      h1 { font-size:1.14rem; white-space:nowrap; }
+      h1 { font-size:1.14rem; overflow-wrap:anywhere; }
       .header-actions { display:contents; }
       .mode-indicator { grid-column:1 / -1; grid-row:2; justify-self:start; white-space:nowrap; }
       .header-actions .icon-button { grid-column:2; grid-row:1; }
@@ -1036,7 +1036,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.4.0";
+const APP_VERSION = "v0.4.1";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],
