@@ -244,6 +244,7 @@ class RunnerIntegrationTest(unittest.TestCase):
         self.assertEqual(frame.locator('#runner-hearts').inner_text(),'♥♥♥')
         self.page.once('dialog',lambda dialog:dialog.dismiss())
         frame.locator('#runner-toggle').click()
+        self.page.wait_for_function("!runnerStarting && !document.querySelector('#formal-character').disabled")
         self.assertEqual(self.page.evaluate("async()=>(await readAll('runnerPlays')).length"),0)
         self.page.once('dialog',lambda dialog:dialog.accept())
         frame.locator('#runner-toggle').evaluate('(b)=>{b.click();b.click();}')

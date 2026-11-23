@@ -36,7 +36,7 @@ class RunnerVerticalCompatibilityTest(unittest.TestCase):
         for id,inputs in CURRENT_INPUTS.items():
             self.page.evaluate("""async id=>{
               await installPhase();window.paid=await buy({stageId:id});
-              if(paid.stageVersion!==(id==='S04'?5:7)||!runnerCanResume(paid)||paid.snapshot.version!==2||DB_VERSION!==10||BACKUP_VERSION!==10)throw Error('versions');
+              if(paid.stageVersion!==(id==='S04'?5:7)||!runnerCanResume(paid)||paid.snapshot.version!==2||DB_VERSION!==11||BACKUP_VERSION!==11)throw Error('versions');
               let c=await openRunnerSession('student',paid.id,{lifecycle:false});await c.resume();await c.advance(.1);await c.pause();
             }""",id)
             self.page.reload();self.page.wait_for_function('appReady')

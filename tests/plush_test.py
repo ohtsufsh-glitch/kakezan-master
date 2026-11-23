@@ -39,7 +39,7 @@ FIXTURE_HELPERS = """() => {
       options:['確認用の甲','確認用の乙'],answers:[0],why:'テスト専用の説明です。',
       revision:1,difficulty:'basic',tag:'culture',shuffleOptions:false,deleted:false}];
     data.coinMeta=[{id:COIN_MIGRATION_KEY,migratedAt:at,legacyClaims:0}];
-    data.sampleSettings=[{id:SAMPLE_QUESTIONS[0].id,hidden:true}];
+    data.sampleSettings=[{id:LEGACY_QUESTIONS[0].id,hidden:true}];
     for (const profile of ['student','test']) {
       data.progress.push({key:`${profile}:${qid}`,profile,questionId:qid,revision:1,
         attempts:2,streak:2,mastered:true,everWrong:false,lastAnsweredAt:at});
@@ -321,7 +321,7 @@ class PlushTest(unittest.TestCase):
         with self.page.expect_download() as event:
             self.page.locator('#backup-export').click()
         backup = json.loads(Path(event.value.path()).read_text())
-        self.assertEqual(backup['backupVersion'], 10)
+        self.assertEqual(backup['backupVersion'], 11)
         self.assertEqual(backup['data'], before)
         self.install(self.fixture())
         cleared = self.snapshot()

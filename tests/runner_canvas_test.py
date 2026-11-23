@@ -1630,7 +1630,7 @@ class RunnerCanvasTest(unittest.TestCase):
                 before=self.snapshot(page)
                 self.assertEqual(len(before['rocks']),1)
                 rock=before['rocks'][0]
-                self.assertTrue(rock['src'].endswith('/runner/assets/spike-rock.webp?v=0.1.0'))
+                self.assertTrue(rock['src'].endswith('/runner/assets/spike-rock.webp?v=0.2.0'))
                 self.assertEqual((rock['naturalWidth'],rock['naturalHeight']),(640,466))
                 self.assertEqual((rock['width'],rock['height']),(80,58.25))
                 self.assertAlmostEqual(rock['width']/rock['height'],640/466,delta=.000001)
