@@ -364,7 +364,7 @@ class RunnerDensityCompatibilityTest(unittest.TestCase):
         for id,inputs in INPUTS.items():
             self.page.evaluate("""async id=>{
               await installPhase();window.paid=await buy({stageId:id});
-              if(paid.stageVersion!==(['S02','S03','S04'].includes(id)?4:2)||!runnerCanResume(paid)||paid.snapshot.version!==2||DB_VERSION!==10||BACKUP_VERSION!==10)throw Error('versions');
+              if(paid.stageVersion!==(['S02','S03','S04'].includes(id)?4:2)||!runnerCanResume(paid)||paid.snapshot.version!==2||DB_VERSION!==11||BACKUP_VERSION!==11)throw Error('versions');
               let c=await openRunnerSession('student',paid.id,{lifecycle:false});await c.resume();await c.advance(.1);await c.pause();
             }""",id)
             self.page.reload();self.page.wait_for_function('appReady')

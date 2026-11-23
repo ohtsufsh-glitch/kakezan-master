@@ -155,7 +155,7 @@ class RunnerBearSaveTest(unittest.TestCase):
               await r.resume();await r.advance(.1);await r.close();
             }
           }
-          return DB_VERSION===10&&BACKUP_VERSION===10&&(await readAll('runnerPlays')).filter(p=>p.status==='active').every(p=>p.snapshot.version===2);
+          return DB_VERSION===11&&BACKUP_VERSION===11&&(await readAll('runnerPlays')).filter(p=>p.status==='active').every(p=>p.snapshot.version===2);
         }'''))
 
 

@@ -109,7 +109,7 @@ class RunnerSpikeDesignTest(unittest.TestCase):
             self.assertEqual(r['different'], 0)
             self.assertGreaterEqual(min(r['regions']), 252)
             self.assertGreater(r['red'], 20000)
-        self.assertTrue(data['src'].endswith('spike-rock.webp?v=0.1.0'))
+        self.assertTrue(data['src'].endswith('spike-rock.webp?v=0.2.0'))
         (self.out / 'image-metrics.json').write_text(json.dumps(data['rows'], indent=2) + '\n')
 
     def scroll_to_game(self):

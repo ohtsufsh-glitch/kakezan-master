@@ -134,7 +134,7 @@ class RunnerCrumblingCompatibilityTest(unittest.TestCase):
               m.resumeRunner(s);
             }
             const c=await openRunnerSession('student',old.id,{lifecycle:false});if(c.view.state.stageVersion!==6)throw Error('old conversion');
-            if(DB_VERSION!==10||BACKUP_VERSION!==10||fresh.snapshot.version!==2)throw Error('formats');
+            if(DB_VERSION!==11||BACKUP_VERSION!==11||fresh.snapshot.version!==2)throw Error('formats');
           }return true;
         }""",dict(base=BASE,plans=INPUTS,landText=LAND)))
 

@@ -369,7 +369,7 @@ class RunnerPhase1CompatibilityTest(unittest.TestCase):
         with self.page.expect_download() as event:
             self.page.evaluate('exportBackup()')
         backup=json.loads(Path(event.value.path()).read_text())
-        self.assertEqual(backup['backupVersion'],10)
+        self.assertEqual(backup['backupVersion'],11)
         self.assertEqual(backup['data'],before)
         self.page.evaluate('b=>validateBackup(b)',backup)
         # Actual file preview and restore handlers, including confirmation.
