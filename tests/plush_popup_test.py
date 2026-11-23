@@ -193,7 +193,7 @@ class PlushPopupTest(unittest.TestCase):
                     self.assertEqual(self.snapshot(), before)
                     self.close(method)
                     self.assertEqual(self.snapshot(), before)
-        self.assertEqual(self.page.evaluate('[DB_VERSION,BACKUP_VERSION,db.objectStoreNames.length]'), [10, 10, 17])
+        self.assertEqual(self.page.evaluate('[DB_VERSION,BACKUP_VERSION,db.objectStoreNames.length]'), [12, 12, 17])
 
     def test_history_length_state_url_and_api_calls_are_unchanged(self):
         before = self.page.evaluate("({length:history.length,state:history.state,url:location.href})")

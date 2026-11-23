@@ -1,0 +1,209 @@
+{
+  "early_6": {
+    "pass": 30,
+    "fail": 78
+  },
+  "current_initial": {
+    "pass": 405,
+    "fail": 16
+  },
+  "legacy_remainder": {
+    "fail": 97,
+    "pass": 9
+  },
+  "current_last": {
+    "pass": 414,
+    "fail": 7
+  },
+  "legacy_last": {
+    "pass": 39,
+    "fail": 175
+  },
+  "all_last": {
+    "pass": 453,
+    "fail": 182
+  },
+  "unique_coverage": 635,
+  "by_file": {
+    "admin_menu_hierarchy_test": {
+      "pass": 11,
+      "fail": 16
+    },
+    "app_isolation_test": {
+      "pass": 3
+    },
+    "app_version_test": {
+      "pass": 10
+    },
+    "arcade_board_test": {
+      "pass": 21
+    },
+    "coin_wording_test": {
+      "fail": 1,
+      "pass": 2
+    },
+    "crane_timing_test": {
+      "pass": 4
+    },
+    "era_question_weight_test": {
+      "fail": 14,
+      "pass": 1
+    },
+    "history_navigation_test": {
+      "fail": 24,
+      "pass": 6
+    },
+    "home_arcade_test": {
+      "pass": 4
+    },
+    "improvement_request_test": {
+      "pass": 10,
+      "fail": 16
+    },
+    "locked_card_test": {
+      "pass": 7
+    },
+    "mobile_regression_test": {
+      "pass": 2
+    },
+    "multiplication_test": {
+      "pass": 9
+    },
+    "plush_popup_test": {
+      "pass": 26
+    },
+    "plush_test": {
+      "pass": 11
+    },
+    "positive_coin_reward_test": {
+      "pass": 9
+    },
+    "progress_cards_test": {
+      "pass": 11
+    },
+    "question_editor_test": {
+      "fail": 7
+    },
+    "question_feedback_test": {
+      "fail": 36,
+      "pass": 6
+    },
+    "quiz_coin_display_test": {
+      "fail": 26,
+      "pass": 1
+    },
+    "runner_animation_test": {
+      "pass": 6
+    },
+    "runner_ascent_test": {
+      "pass": 7
+    },
+    "runner_balance_test": {
+      "pass": 7
+    },
+    "runner_bear_test": {
+      "pass": 5
+    },
+    "runner_canvas_test": {
+      "pass": 30
+    },
+    "runner_character_ui_test": {
+      "pass": 5,
+      "fail": 1
+    },
+    "runner_characters_test": {
+      "pass": 6
+    },
+    "runner_crumbling_test": {
+      "pass": 9
+    },
+    "runner_density_test": {
+      "pass": 14
+    },
+    "runner_difficulty_test": {
+      "pass": 6
+    },
+    "runner_fall_test": {
+      "pass": 5
+    },
+    "runner_header_test": {
+      "pass": 7
+    },
+    "runner_hit_feedback_test": {
+      "pass": 2,
+      "fail": 1
+    },
+    "runner_integration_test": {
+      "pass": 16
+    },
+    "runner_layout_test": {
+      "pass": 5
+    },
+    "runner_phase1_test": {
+      "pass": 12
+    },
+    "runner_phase2a_test": {
+      "pass": 10
+    },
+    "runner_preview_test": {
+      "pass": 7,
+      "fail": 4
+    },
+    "runner_records_ui_test": {
+      "pass": 2
+    },
+    "runner_results_test": {
+      "pass": 12
+    },
+    "runner_retire_test": {
+      "pass": 14
+    },
+    "runner_safari_test": {
+      "pass": 8
+    },
+    "runner_selection_test": {
+      "pass": 5
+    },
+    "runner_session_test": {
+      "pass": 11
+    },
+    "runner_spike_design_test": {
+      "pass": 4
+    },
+    "runner_stages_test": {
+      "pass": 10
+    },
+    "runner_storage_test": {
+      "pass": 9
+    },
+    "runner_test_mode_test": {
+      "pass": 4
+    },
+    "runner_tuning_test": {
+      "pass": 11
+    },
+    "runner_vertical_test": {
+      "pass": 13
+    },
+    "runner_wall_design_test": {
+      "pass": 3
+    },
+    "runner_yuniko_test": {
+      "pass": 6
+    },
+    "secret_plush_test": {
+      "pass": 26,
+      "fail": 1
+    },
+    "study_coin_integration_test": {
+      "fail": 8
+    },
+    "study_modes_test": {
+      "fail": 23
+    },
+    "ui_cleanup_test": {
+      "pass": 2,
+      "fail": 4
+    }
+  }
+}

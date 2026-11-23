@@ -290,7 +290,7 @@ class RunnerCharactersTest(unittest.TestCase):
         characters = {'shiba': (200, .90, 2), 'sloth': (170, 1.10, 2),
                       'goldfish': (185, 1.05, 2), 'salamander': (230, .82, 3)}
         for character_id, (speed, duration, lives) in characters.items():
-            page.locator('#runner-character-select').select_option(character_id)
+            page.locator(f'#runner-character-cards [data-choice="{character_id}"]').click()
             page.wait_for_function('runnerImages.every(image=>image.complete)', polling=50)
             self.settle(page)
             for stage_id, spec in EXPECTED.items():
@@ -329,7 +329,7 @@ class RunnerCharactersTest(unittest.TestCase):
                         self.assertEqual(outcome['next'], len(inputs))
                         self.assertEqual((outcome['result'], outcome['resultScore'], outcome['progress'],
                                           outcome['hud']), ('クリア！', '100', '100', '♥'*lives))
-                        self.assertEqual(outcome['livesLabel'], f'残機{lives}機中あと{lives}機')
+                        self.assertEqual(outcome['livesLabel'], f'ハートはあと{lives}個（全部で{lives}個）')
         self.assert_isolated(page, errors, requests)
 
     def test_shiba_full_frame_traces_match_unchanged_main_course_and_all_stages(self):

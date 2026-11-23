@@ -141,7 +141,10 @@ class RunnerAnimationTest(unittest.TestCase):
             for route in held:
                 route.fulfill(status=404,body='missing')
             try:
-                page.wait_for_function('runnerImages.every(i=>i.complete)')
+                # preview_runner uses MANUAL_FRAMES. A late 404 can complete after
+                # the first predicate check while its rAF poll remains frozen.
+                # Poll wall time, keeping the same 5s timeout and exact condition.
+                page.wait_for_function('runnerImages.every(i=>i.complete)', polling=50)
             except Exception:
                 self.fail(f'{id}: pending images '+str(page.evaluate('runnerImages.filter(i=>!i.complete).map(i=>i.src)')))
             self.settle(page)

@@ -1,0 +1,82 @@
+[
+  {
+    "version": 1,
+    "id": "shiba",
+    "score": 10,
+    "distance": 1806.666666666693,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 1,
+    "id": "sloth",
+    "score": 10,
+    "distance": 1806.250000000031,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 1,
+    "id": "goldfish",
+    "score": 10,
+    "distance": 1806.8333333333617,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 1,
+    "id": "salamander",
+    "score": 10,
+    "distance": 2855.8333333333017,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 1,
+    "id": "bear",
+    "score": 10,
+    "distance": 2856,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 7,
+    "id": "shiba",
+    "score": 0,
+    "distance": 606.6666666666669,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 7,
+    "id": "sloth",
+    "score": 0,
+    "distance": 606.3333333333336,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 7,
+    "id": "goldfish",
+    "score": 0,
+    "distance": 605.8750000000002,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 7,
+    "id": "salamander",
+    "score": 0,
+    "distance": 845.2499999999955,
+    "reason": "collision",
+    "lives": 0
+  },
+  {
+    "version": 7,
+    "id": "bear",
+    "score": 0,
+    "distance": 846,
+    "reason": "collision",
+    "lives": 0
+  }
+]

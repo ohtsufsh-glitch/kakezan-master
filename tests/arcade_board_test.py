@@ -369,7 +369,8 @@ class ArcadeBoardTest(unittest.TestCase):
         with self.page.expect_download() as event:
             self.page.locator('#backup-export').click()
         backup = json.loads(Path(event.value.path()).read_text())
-        self.assertEqual(backup['backupVersion'], 10)
+        # The historical test name describes its origin; export is current v12.
+        self.assertEqual(backup['backupVersion'], 12)
         self.assertEqual(backup['data'], before)
         self.install()
         changed = self.snapshot()
@@ -437,7 +438,13 @@ class ArcadeBoardTest(unittest.TestCase):
                     if status == 'aiming':
                         del p['result']
                     data['arcadePrizes'] = []
-                    data.pop('arcadeBoards')
+                    # A retained 3/7-slot play is supported, but a v12 backup
+                    # still requires all 17 stores. Keep absence of the old
+                    # 3-slot profile's board; a 7-slot pending play must match.
+                    if slots == 3:
+                        data['arcadeBoards'] = [b for b in data['arcadeBoards'] if b['profile'] != 'student']
+                    else:
+                        next(b for b in data['arcadeBoards'] if b['profile'] == 'student')['slots'] = p['prizes'][:]
                     normalized = self.page.evaluate('data=>validateBackup({backupFormat:BACKUP_FORMAT,backupVersion:BACKUP_VERSION,data})', data)
                     self.page.evaluate('async data=>{await plushInstall(data);profile="student";await openArcade();}', normalized)
                     self.assertTrue(self.page.locator('#crane-replace').is_disabled())
