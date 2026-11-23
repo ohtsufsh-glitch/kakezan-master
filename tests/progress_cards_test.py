@@ -3,6 +3,7 @@ import copy
 import json
 from pathlib import Path
 import unittest
+from playwright.sync_api import expect
 import multiplication_test as numeric
 
 SEED = """async ({count=0,who='student',partial=false,awards=false})=>{
@@ -149,7 +150,11 @@ class ProgressCardsTest(unittest.TestCase):
         self.assertEqual(self.page.locator('#report-list > section').count(),81)
         first=self.page.locator('#report-list > section').first
         self.assertIn('通算回答 25回 ／ 通算正解 5回 ／ 正答率 20% ／ 習得済み',first.inner_text())
-        first.locator('summary').click();self.assertEqual(first.locator('li').count(),25)
+        first.locator('summary').click()
+        history=first.locator('details')
+        # click完了後にtoggleイベントで生成される明細を、件数も含めて待つ。
+        expect(history).to_have_js_property('open',True)
+        expect(history.locator('li')).to_have_count(25)
         self.assertEqual(first.locator('li').filter(has_text='○').count(),5)
         self.assertIn('—（0回）',self.page.locator('#report-list > section').nth(3).inner_text())
         self.assertIn('通算39回答',self.page.locator('#report-summary').inner_text())
