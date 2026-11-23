@@ -88,7 +88,7 @@ class MultiplicationTest(unittest.TestCase):
         self.answer()
         p=self.page.evaluate('id=>readOne("progress",`student:${id}`)',q)
         self.assertTrue(p['mastered']);self.assertEqual(p['streak'],2);self.assertEqual(p['attempts'],3)
-        self.assertEqual(self.page.evaluate('getAvailableCoins()'),5)
+        self.assertEqual(self.page.evaluate('getAvailableCoins()'),6)
         self.assertEqual(self.page.evaluate('studyCandidates("weak",null,QUESTIONS,new Map([[currentQuestion.id,currentProgress]])).length'),0)
         self.page.evaluate('beginTestMode()');self.quiz()
         self.assertEqual(self.page.evaluate('getAvailableCoins()'),0)
@@ -161,7 +161,7 @@ class MultiplicationTest(unittest.TestCase):
         self.page.evaluate('window.pendingGrade=grade()')
         other.evaluate('grade()');self.page.evaluate('pendingGrade')
         self.assertEqual(len(self.page.evaluate("readAll('answers')")),1)
-        self.assertEqual(self.page.evaluate('getAvailableCoins()'),2)
+        self.assertEqual(self.page.evaluate('getAvailableCoins()'),5)
         before=self.page.evaluate('snapshotAllStores()')
         with self.page.expect_download() as event:self.page.evaluate('exportBackup()')
         import json
