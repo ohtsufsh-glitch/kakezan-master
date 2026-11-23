@@ -183,6 +183,7 @@
     .trophy.complete-card { grid-column:1/-1; border:2px solid #aa8329; }
     #report-list li { overflow-wrap:anywhere; line-height:1.7; }
     #learning-report summary { min-height:44px; padding:10px 0; cursor:pointer; }
+    #learning-report select { min-height:44px; }
     .trophy-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:14px; }
     /* カード画像はGitHub Pagesの同一オリジン内で読み込む。学習データには画像を保存しない。 */
     .trophy-open { width:100%; color:inherit; font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
@@ -820,7 +821,12 @@
     <h2>⚙️ 保護者用管理画面</h2>
     <p id="app-version" class="muted small"></p>
     <p class="muted admin-lead">九九81問は固定です。テストモード、回答履歴、バックアップ・復元を利用できます。旧版の履歴も保存を継続します。</p>
-    <details id="learning-report" open>
+    <div class="admin-test-area">
+      <h3>🔧 動作確認</h3>
+      <p class="muted small">テストモードで解いた結果・コイン・クレーン景品は娘さん用に反映されません。クレーンは残高0枚でも無料で何度でも遊べます。問題データ自体は共通です。</p>
+      <button id="admin-start-test" class="primary" type="button">テストモードを開始（問題・クレーン）</button>
+    </div>
+    <details id="learning-report">
       <summary>九九81問の通算正答率</summary>
       <p class="small muted">全期間の回答を集計します。正答率順では未回答を最後に表示し、同率は問題ID順です。○×履歴は問題ごとに開けます。</p>
       <div class="manager-controls">
@@ -832,11 +838,6 @@
       <div id="report-list"></div>
     </details>
     <details id="answer-history"><summary>回答履歴を見る</summary><label>対象<select id="history-profile"><option value="student">学習用</option><option value="test">テスト用</option></select></label><div id="answer-history-list"></div></details>
-    <div class="admin-test-area">
-      <h3>🔧 動作確認</h3>
-      <p class="muted small">テストモードで解いた結果・コイン・クレーン景品は娘さん用に反映されません。クレーンは残高0枚でも無料で何度でも遊べます。問題データ自体は共通です。</p>
-      <button id="admin-start-test" class="primary" type="button">テストモードを開始（問題・クレーン）</button>
-    </div>
     <details hidden id="admin-questions-group" class="admin-group" open>
       <summary aria-controls="admin-questions-content"><h3>📚 問題を管理する<span class="muted small">問題の追加・編集・一括更新</span></h3></summary>
       <div id="admin-questions-content" class="admin-group-content">
@@ -1042,7 +1043,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.4.3";
+const APP_VERSION = "v0.4.4";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],

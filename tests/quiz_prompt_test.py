@@ -84,6 +84,9 @@ class QuizPromptTest(unittest.TestCase):
                     expect(self.page.locator('#check')).to_be_disabled()
                     self.assert_layout()
                     self.page.evaluate('navigate("admin")')
+                    if not self.page.locator('#learning-report').evaluate('el=>el.open'):
+                        self.page.locator('#learning-report > summary').click()
+                    expect(self.page.locator('#learning-report')).to_have_js_property('open', True)
                     expect(self.page.locator('#report-list > section')).to_have_count(81)
                     self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
 
