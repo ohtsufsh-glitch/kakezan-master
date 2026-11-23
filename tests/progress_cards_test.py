@@ -68,7 +68,7 @@ class ProgressCardsTest(unittest.TestCase):
         self.assertEqual(self.page.locator('#card-total').inner_text(),'1 / 10枚')
         self.page.locator('#card-gallery button').click()
         self.assertIn('1の段達成カード',self.page.locator('#card-detail-title').inner_text())
-        self.assertIn('制作待ち',self.page.locator('#card-detail-era').inner_text())
+        self.assertIn('1の段の9問を同時に習得',self.page.locator('#card-detail-era').inner_text())
 
     def test_all81_requires_current_mastery_and_grants_two_cards_at_once(self):
         self.seed(count=80,awards=True)
