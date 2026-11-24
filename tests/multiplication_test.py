@@ -60,20 +60,20 @@ class MultiplicationTest(unittest.TestCase):
         self.assertEqual(self.page.evaluate('phase'),'result')
         self.assertEqual(self.errors,[])
 
-    def test_mix_ten_unique_and_explicit_next(self):
+    def test_mix_twenty_unique_and_explicit_next(self):
         self.page.evaluate('startStudy("mix")')
         self.page.wait_for_function('quizReady')
         entries=self.page.evaluate('currentSession.entries')
-        self.assertEqual(len(entries),10);self.assertEqual(len({e['questionId'] for e in entries}),10)
-        for i in range(10):
+        self.assertEqual(len(entries),20);self.assertEqual(len({e['questionId'] for e in entries}),20)
+        for i in range(20):
             self.answer()
             self.assertEqual(self.page.evaluate('phase'),'result')
             self.assertEqual(self.page.evaluate('currentSession.position'),i)
             self.assertTrue(self.page.evaluate('async()=>{const d=await snapshotAllStores();return !!validateBackup({backupFormat:BACKUP_FORMAT,backupVersion:BACKUP_VERSION,data:d});}'))
             self.page.locator('#next').click()
             self.page.wait_for_function('currentSession.phase==="complete" || (quizReady&&phase==="question")')
-        self.assertIn('回答数 10問',self.page.locator('#study-result-summary').inner_text())
-        self.assertEqual(len(self.page.evaluate("readAll('answers')")),10)
+        self.assertIn('20もんちゅう 20もん せいかい',self.page.locator('#study-result-summary').inner_text())
+        self.assertEqual(len(self.page.evaluate("readAll('answers')")),20)
         self.assertEqual(self.errors,[])
 
     def test_mastery_shared_modes_coins_and_test_separation(self):

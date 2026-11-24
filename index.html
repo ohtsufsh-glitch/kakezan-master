@@ -381,6 +381,24 @@
       background:linear-gradient(180deg,#f8fcfd 0%,#f0f7f9 100%);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
     }
+    .dashboard-grid > #genre-dashboard {
+      width:100%; text-align:center; padding:22px 16px; color:#78364f;
+      border:2px solid #e5a0b9; background:linear-gradient(145deg,#fff7fb,#ffe6ef);
+      box-shadow:0 4px 0 #efccda; overflow-wrap:anywhere;
+    }
+    #genre-dashboard > span, #genre-dashboard > strong { display:block; }
+    #genre-dashboard:focus-visible { outline:3px solid #a52b60; outline-offset:4px; }
+    #genre-dashboard:active { box-shadow:0 1px 0 #efccda; }
+    .test-card-title { font-size:1.3rem; font-weight:800; }
+    .test-card-intro { margin-top:12px; line-height:1.6; }
+    .test-card-full { margin:12px 0; font-size:1.4rem; color:#a52b60; }
+    .test-card-action { padding:12px 8px; border-radius:12px; background:#a52b60; color:#fff; font-weight:750; line-height:1.6; }
+    .test-card-note { margin-top:12px; font-size:.8rem; line-height:1.6; }
+    #study-finished.test-result { text-align:center; border:2px solid #edbed0; background:linear-gradient(#fff7fb,#fff); padding-block:28px; overflow-wrap:anywhere; }
+    #study-result-score { margin:24px 0; color:#a52b60; font-size:clamp(3rem,15vw,6rem); font-weight:900; line-height:1.35; }
+    .test-result #study-result-summary { font-size:1.2rem; font-weight:750; }
+    .test-result #study-result-remaining { margin-bottom:28px; }
+    .test-result #study-last-result { text-align:left; }
     .home-genre-heading {
       display:flex;
       align-items:center;
@@ -717,11 +735,13 @@
             <p class="radar-caption">1回連続正解で半分、2回連続正解で習得。間違えるとその問題の理解度は0に戻ります。</p>
           </div>
         </div>
-        <section id="genre-dashboard" class="genre-panel home-genre" aria-labelledby="genre-heading">
-          <div class="home-genre-heading"><h3 id="genre-heading">全段ミックス</h3><span class="genre-count">81問</span></div>
-          <p class="home-genre-intro">81問から重複なしの10問セット。</p>
-          <div id="genre-list" role="group" aria-label="全段ミックス"></div>
-        </section>
+        <button id="genre-dashboard" class="genre-panel home-genre" type="button" aria-label="かけざんテスト、20問、100点満点、開始">
+          <span class="test-card-title">📝 かけざんテスト</span>
+          <span class="test-card-intro">20もんに ちょうせん！</span>
+          <strong class="test-card-full">100てん まんてん</strong>
+          <span id="test-card-action" class="test-card-action">テストを はじめる！</span>
+          <span id="test-card-note" class="test-card-note">81もんから ランダムに しゅつだい</span>
+        </button>
       </div>
     </div>
 
@@ -734,7 +754,7 @@
       <h2>🎯 苦手克服</h2>
       <p id="weak-count"></p>
       <button id="start-weak" class="primary" type="button">苦手問題に挑戦</button>
-      <p class="muted small">間違えた問題を最大10問ずつ復習。未挑戦の問題は段別・全段ミックスで学ぼう。</p>
+      <p class="muted small">間違えた問題を最大10問ずつ復習。未挑戦の問題は段別・かけざんテストで学ぼう。</p>
     </section>
 
     <div class="arcade-home-grid">
@@ -1015,6 +1035,7 @@
 
   <section id="study-finished" class="card hidden" aria-labelledby="study-result-title">
     <h2 id="study-result-title"></h2>
+    <p id="study-result-score" class="hidden"></p>
     <p id="study-result-summary"></p>
     <p id="study-result-remaining"></p>
     <div id="study-last-result" class="result hidden" aria-live="polite"></div>
@@ -1174,7 +1195,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.4.5";
+const APP_VERSION = "v0.4.6";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],
@@ -2154,10 +2175,15 @@ function genreMasteryStats(tag, progressByQuestion) {
   const percentage=qs.length ? (mastered+partial*.5)/qs.length*100 : null;
   return {count:qs.length,mastered,learning:started-mastered,unseen:qs.length-started,partial,percentage};
 }
-function renderGenreDashboard() {
-  const list=$("genre-list");list.replaceChildren();
-  const button=document.createElement("button");button.type="button";button.textContent="全段ミックス（10問）・再開";
-  button.addEventListener("click",()=>startStudy("mix").catch(err));list.append(button);
+function renderGenreDashboard(set) {
+  const legacy=set&&set.entries.length<=10;
+  const action=set ? set.phase==="complete" ? "けっかを もういちどみる" : legacy ? "以前の10問セットを再開" : "テストを つづける！" : "テストを はじめる！";
+  $("genre-dashboard").querySelector(".test-card-title").textContent=legacy?"📝 以前の10問セット":"📝 かけざんテスト";
+  $("genre-dashboard").querySelector(".test-card-intro").textContent=legacy?"前のつづきから はじめよう！":"20もんに ちょうせん！";
+  $("genre-dashboard").querySelector(".test-card-full").textContent=legacy?"おわったら 20もんテストへ":"100てん まんてん";
+  $("test-card-action").textContent=action;
+  $("test-card-note").textContent=legacy ? "以前の10問セットです。おわったら新しいテストへ！" : "81もんから ランダムに しゅつだい";
+  $("genre-dashboard").setAttribute("aria-label",legacy ? `以前の10問セット、${action}` : `かけざんテスト、20問、100点満点、${action}`);
 }
 
 function titleForMastery(stats) {
@@ -4510,7 +4536,7 @@ async function renderHome({stay=false}={}) {
   $("weak-count").textContent=weak ? `苦手問題は${weak}問` : "苦手問題はありません";
   $("start-weak").textContent=unfinished ? `苦手セットを再開（苦手${weak}問）` : weak ? `🎯 苦手問題に挑戦（${weak}問）` : "🎉 苦手問題をすべて克服したよ！";
   $("start-weak").disabled=!weak&&!unfinished;
-  renderGenreDashboard(records);
+  renderGenreDashboard(sets.find(s=>s.key===studySetKey(ctx.who,"mix")));
   renderCollection(allStats,awards);
   await refreshArcadeHome(ctx);
   if(!viewCurrent(ctx)||request!==homeRender)return;
@@ -4520,7 +4546,9 @@ async function renderHome({stay=false}={}) {
 // 新モードの正本。時代別sessionsとは独立し、プロフィール×モード×ジャンルで保持する。
 function validStudyMode(mode,genre) { return ["weak","mix"].includes(mode)&&!genre; }
 function studySetKey(who,mode,genre=null) { return `${who}:numeric:${mode}`; }
-function studyLabel(mode,genre) { return mode==="weak"?"苦手克服":"全段ミックス"; }
+function studyLabel(mode,genre) { return mode==="weak"?"苦手克服":"かけざんテスト"; }
+function isMultiplicationTest(set) { return set.mode==="mix"&&set.entries.length===20; }
+function studySetLabel(set) { return set.mode==="mix"&&!isMultiplicationTest(set)?"以前の10問セット":studyLabel(set.mode,set.genre); }
 function studyCandidates(mode,genre,questions,records) {
   return questions.filter(q=>mode==="mix" ? true :
     activeProgress(q,records.get(q.id))?.everWrong===true&&activeProgress(q,records.get(q.id))?.mastered===false);
@@ -4528,9 +4556,9 @@ function studyCandidates(mode,genre,questions,records) {
 function availableQuestions(questions,settings) {
   return [...SAMPLE_QUESTIONS];
 }
-function sampleStudyEntries(candidates,events,who) {
+function sampleStudyEntries(candidates,events,who,mode="weak") {
   const stats=new Map(),byId=new Map(candidates.map(q=>[q.id,q]));
-  for(const ev of events) {
+  for(const ev of mode==="mix"?[]:events) {
     if(ev.profile!==who)continue;
     const q=byId.get(ev.questionId);
     if(!q||(ev.revision||1)!==questionRevision(q))continue;
@@ -4538,8 +4566,9 @@ function sampleStudyEntries(candidates,events,who) {
     stat.attempts++;if(ev.correct)stat.correct++;stats.set(q.id,stat);
   }
   const pool=[...candidates],entries=[];
-  while(pool.length&&entries.length<10) {
-    const weights=pool.map(q=>questionWeight(stats.get(q.id)));
+  while(pool.length&&entries.length<(mode==="mix"?20:10)) {
+    // mixは各残候補を等確率で抽選。weakの実績重みは従来どおり。
+    const weights=pool.map(q=>mode==="mix"?1:questionWeight(stats.get(q.id)));
     let roll=Math.random()*weights.reduce((a,b)=>a+b,0),index=pool.length-1;
     for(let i=0;i<pool.length;i++){roll-=weights[i];if(roll<0){index=i;break;}}
     const q=pool.splice(index,1)[0];entries.push({questionId:q.id,revision:questionRevision(q)});
@@ -4603,10 +4632,10 @@ async function startStudy(mode,genre=null,restart=false) {
     if(!viewCurrent(ctx))return;
     if(restart&&previous?.phase!=="complete"&&!confirm("このセットを最初から作り直しますか？\n回答履歴・コイン・習得状況は取り消しません。"))return;
     await changeStudySet(key,(old,questions,progress,events)=>{
-      if(old&&old.phase!=="complete"&&!restart)return old;
+      if(old&&(old.phase!=="complete"||mode==="mix")&&!restart)return old;
       if(!sameRecord(old,previous))throw new Error("別タブでセットが変わりました。もう一度開いてください。");
       const records=new Map(progress.filter(p=>p.profile===ctx.who).map(p=>[p.questionId,p]));
-      const entries=sampleStudyEntries(studyCandidates(mode,genre,questions,records),events,ctx.who);
+      const entries=sampleStudyEntries(studyCandidates(mode,genre,questions,records),events,ctx.who,mode);
       const now=new Date().toISOString();
       return prepareStudyQuestion({key,profile:ctx.who,mode,genre:genre||null,setId:crypto.randomUUID(),entries,
         position:0,phase:"question",questionId:null,answerType:"number",answer:null,results:[],startedAt:now,updatedAt:now},questions,records);
@@ -4629,11 +4658,21 @@ async function restoreStudy(mode,genre,ctx=viewContext()) {
   currentSession=structuredClone(set);phase=set.phase;
   if(set.phase==="complete") {
     quizReady=false;currentQuestion=null;currentProgress=null;
-    $("study-result-title").textContent=`${studyLabel(mode,genre)} セット結果`;
+    const test=isMultiplicationTest(set);
+    $("study-finished").classList.toggle("test-result",test);
+    $("study-result-title").textContent=test?"🎉 かけざんテスト けっかはっぴょう！":`${studySetLabel(set)} セット結果`;
     const count=set.results.length,correct=set.results.filter(r=>r.correct).length;
-    $("study-result-summary").textContent=`回答数 ${count}問 ｜ 正解数 ${correct}問 ｜ 正答率 ${count?Math.round(correct/count*100):0}%`;
+    $("study-result-score").classList.toggle("hidden",!test);
+    $("study-result-score").textContent=test?`${correct*5}てん！`:"";
+    $("study-result-summary").textContent=test?`20もんちゅう ${correct}もん せいかい`:`回答数 ${count}問 ｜ 正解数 ${correct}問 ｜ 正答率 ${count?Math.round(correct/count*100):0}%`;
+    $("study-again").textContent=mode==="mix"?"もういちどテスト":"もう1セット挑戦";
+    $("study-home").textContent=mode==="mix"?"ホームへもどる":"学習ホームへ戻る";
     const remaining=studyCandidates(mode,genre,activeQuestions,activeProgressRecords).length;
-    $("study-result-remaining").textContent=mode==="weak" ? remaining?`現在残っている苦手問題：${remaining}問`:"🎉 苦手問題をすべて克服したよ！ 未挑戦の問題は段別・全段ミックスで学ぼう。" : remaining?"全段の問題に挑戦できたね！":"このジャンルの出題できる問題はありません。";
+    let message;
+    if(test) message=correct===20 ? "ぜんもん せいかい！ よく がんばったね！" : correct>=10 ? "さいごまで がんばったね！ また ちょうせんしよう！" : "20もんに ちょうせんできたね！ いっしょに れんしゅうしていこう！";
+    else if(mode==="mix") message="以前の10問セットが おわったよ！ つぎは20もんの かけざんテストに ちょうせん！";
+    else message=remaining?`現在残っている苦手問題：${remaining}問`:"🎉 苦手問題をすべて克服したよ！ 未挑戦の問題は段別・かけざんテストで学ぼう。";
+    $("study-result-remaining").textContent=message;
     $("study-again").disabled=!remaining;
     const last=set.results.find(r=>r.position===set.entries.length-1);
     const q=last&&activeQuestions.find(q=>q.id===last.questionId&&questionRevision(q)===last.revision);
@@ -4701,7 +4740,7 @@ function validateStudySets(sets,questions) {
     const fail=()=>{throw new Error("数値回答セットが不正です。");};
     if(!s||!isProfile(s.profile)||!validStudyMode(s.mode,s.genre)||s.key!==studySetKey(s.profile,s.mode,s.genre)||keys.has(s.key)||
       !isNonemptyString(s.setId,100)||!isNonemptyString(s.startedAt,64)||!isNonemptyString(s.updatedAt,64)||
-      !Array.isArray(s.entries)||s.entries.length>10||!Number.isInteger(s.position)||s.position<0||s.position>s.entries.length||
+      !Array.isArray(s.entries)||(s.mode==="mix"?s.entries.length>10&&s.entries.length!==20:s.entries.length>10)||!Number.isInteger(s.position)||s.position<0||s.position>s.entries.length||
       !["question","result","complete"].includes(s.phase)||!validNumericState(s)||!Array.isArray(s.results))fail();
     keys.add(s.key);
     const ids=new Set(),positions=new Set();
@@ -4818,8 +4857,8 @@ function renderQuestion() {
   const inSet=!!currentSession?.mode;
   $("study-progress").classList.toggle("hidden",!inSet);
   $("restart-study").classList.toggle("hidden",!inSet);
-  $("study-progress").textContent=inSet ? `${studyLabel(currentSession.mode,currentSession.genre)} ｜ ${currentSession.position+1} / ${currentSession.entries.length}問` : "";
-  $("next").textContent=inSet&&currentSession.position===currentSession.entries.length-1 ? "つぎへ（セット結果）" : "つぎへ";
+  $("study-progress").textContent=inSet ? `${studySetLabel(currentSession)}　${currentSession.position+1} / ${currentSession.entries.length}もん` : "";
+  $("next").textContent=inSet&&currentSession.position===currentSession.entries.length-1 ? "けっかをみる！" : "つぎへ";
   $("question-kind").textContent="すうじでこたえてね ｜ 基礎";
   $("question-text").textContent=`${q.left} × ${q.right}`;
   $("result").classList.add("hidden");$("next").classList.add("hidden");
@@ -5294,6 +5333,7 @@ $("check").addEventListener("click", grade);
 $("next").addEventListener("click", () => {if(quizReady&&phase==="result"&&!saving)(currentSession?.mode?nextStudy():advance(currentEra,currentQuestion.id)).catch(err);});
 $("start-weak").addEventListener("click",()=>startStudy("weak").catch(err));
 $("study-home").addEventListener("click",()=>navigateHome().catch(err));
+$("genre-dashboard").addEventListener("click",()=>startStudy("mix").catch(err));
 $("study-again").addEventListener("click",()=>startStudy(currentSession.mode,currentSession.genre,true).catch(err));
 $("restart-study").addEventListener("click",()=>startStudy(currentSession.mode,currentSession.genre,true).catch(err));
 $("card-preview-panel").addEventListener("toggle",event=>{
