@@ -311,6 +311,19 @@
       box-shadow: 0 10px 28px rgba(40,57,70,.06), inset 0 1px 0 rgba(255,255,255,.65);
       margin-top: 18px;
     }
+    /* 九九ひょう専用。画像と閉じる操作の領域を分け、元画像を切り取らない。 */
+    #open-kuku-chart { display:block; width:100%; min-height:48px; margin:0 0 16px; padding:12px 16px; border:2px solid #e4a2b5; border-radius:16px; background:linear-gradient(135deg,#fff4f7,#fff9eb); color:#88374f; font:inherit; font-weight:800; font-size:1.1rem; box-shadow:0 3px 0 #efd0d7; cursor:pointer; }
+    #open-kuku-chart:focus-visible, #kuku-chart-close:focus-visible { outline:3px solid #245e80; outline-offset:2px; }
+    body.kuku-chart-open { position:fixed; inset-inline:0; overflow:hidden; }
+    #kuku-chart-dialog { inset:env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); width:95vw; height:95vh; height:95dvh; max-width:calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 8px); max-height:calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 8px); max-height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 8px); margin:auto; padding:6px; border:1px solid #e4a2b5; border-radius:14px; background:#fff8fa; color:#88374f; overflow:hidden; }
+    #kuku-chart-dialog[open] { display:grid; grid-template-rows:auto minmax(0,1fr); gap:4px; }
+    #kuku-chart-dialog::backdrop { background:rgba(20,25,40,.48); }
+    .kuku-chart-toolbar { display:flex; justify-content:flex-end; }
+    #kuku-chart-close { min-width:88px; min-height:44px; padding:8px 14px; border:1px solid #bb637d; border-radius:12px; background:#fff; color:#88374f; font:inherit; font-weight:800; cursor:pointer; }
+    .kuku-chart-stage { min-width:0; min-height:0; }
+    #kuku-chart-image { display:block; width:100%; height:100%; object-fit:contain; }
+    /* 読み上げでは段ごとの見出しと81式・よみかたを順番にたどれる。 */
+    .kuku-chart-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); clip-path:inset(50%); white-space:nowrap; }
     .dashboard-panel { margin-top: 0; }
     .panel-head {
       display:flex;
@@ -683,6 +696,8 @@
 
     <p id="home-subtitle" class="muted hidden"></p>
 
+    <button id="open-kuku-chart" type="button" aria-haspopup="dialog" aria-controls="kuku-chart-dialog">🌸 九九ひょうをみる</button>
+
     <div id="dashboard" aria-label="理解度と学習" class="home-panel dashboard-panel">
       <div class="panel-head">
         <div><span class="section-kicker">PROGRESS</span><h3>9段の理解度</h3></div>
@@ -1014,6 +1029,122 @@
     <button id="finish-home" class="primary" type="button">ホームへ戻る</button>
   </section>
 </main>
+<dialog id="kuku-chart-dialog" aria-labelledby="kuku-chart-title">
+  <h2 id="kuku-chart-title" class="kuku-chart-sr">九九ひょう</h2>
+  <div class="kuku-chart-toolbar"><button id="kuku-chart-close" type="button" autofocus>とじる</button></div>
+  <div class="kuku-chart-stage"><img id="kuku-chart-image" width="2172" height="2896" alt="1の段から9の段まで、81問の式とよみかたをまとめた九九ひょう。式とよみかたは、この後のテキストでも確認できます。"></div>
+  <!-- 提供JSONのテキスト代替。学習用QUESTIONS・ID・正答データとは独立。 -->
+  <section id="kuku-chart-readings" class="kuku-chart-sr" aria-label="九九81問の式とよみかた">
+    <h3>1の段</h3>
+    <ul>
+      <li>1 × 1 = 1。いんいちがいち</li>
+      <li>1 × 2 = 2。いんにがに</li>
+      <li>1 × 3 = 3。いんさんがさん</li>
+      <li>1 × 4 = 4。いんしがし</li>
+      <li>1 × 5 = 5。いんごがご</li>
+      <li>1 × 6 = 6。いんろくがろく</li>
+      <li>1 × 7 = 7。いんしちがしち</li>
+      <li>1 × 8 = 8。いんはちがはち</li>
+      <li>1 × 9 = 9。いんくがく</li>
+    </ul>
+    <h3>2の段</h3>
+    <ul>
+      <li>2 × 1 = 2。にいちがに</li>
+      <li>2 × 2 = 4。ににんがし</li>
+      <li>2 × 3 = 6。にさんがろく</li>
+      <li>2 × 4 = 8。にしがはち</li>
+      <li>2 × 5 = 10。にごじゅう</li>
+      <li>2 × 6 = 12。にろくじゅうに</li>
+      <li>2 × 7 = 14。にしちじゅうし</li>
+      <li>2 × 8 = 16。にはちじゅうろく</li>
+      <li>2 × 9 = 18。にくじゅうはち</li>
+    </ul>
+    <h3>3の段</h3>
+    <ul>
+      <li>3 × 1 = 3。さんいちがさん</li>
+      <li>3 × 2 = 6。さんにがろく</li>
+      <li>3 × 3 = 9。さざんがく</li>
+      <li>3 × 4 = 12。さんしじゅうに</li>
+      <li>3 × 5 = 15。さんごじゅうご</li>
+      <li>3 × 6 = 18。さぶろくじゅうはち</li>
+      <li>3 × 7 = 21。さんしちにじゅういち</li>
+      <li>3 × 8 = 24。さんぱにじゅうし</li>
+      <li>3 × 9 = 27。さんくにじゅうしち</li>
+    </ul>
+    <h3>4の段</h3>
+    <ul>
+      <li>4 × 1 = 4。しいちがし</li>
+      <li>4 × 2 = 8。しにがはち</li>
+      <li>4 × 3 = 12。しさんじゅうに</li>
+      <li>4 × 4 = 16。ししじゅうろく</li>
+      <li>4 × 5 = 20。しごにじゅう</li>
+      <li>4 × 6 = 24。しろくにじゅうし</li>
+      <li>4 × 7 = 28。ししちにじゅうはち</li>
+      <li>4 × 8 = 32。しはさんじゅうに</li>
+      <li>4 × 9 = 36。しくさんじゅうろく</li>
+    </ul>
+    <h3>5の段</h3>
+    <ul>
+      <li>5 × 1 = 5。ごいちがご</li>
+      <li>5 × 2 = 10。ごにじゅう</li>
+      <li>5 × 3 = 15。ごさんじゅうご</li>
+      <li>5 × 4 = 20。ごしにじゅう</li>
+      <li>5 × 5 = 25。ごごにじゅうご</li>
+      <li>5 × 6 = 30。ごろくさんじゅう</li>
+      <li>5 × 7 = 35。ごしちさんじゅうご</li>
+      <li>5 × 8 = 40。ごはしじゅう</li>
+      <li>5 × 9 = 45。ごっくしじゅうご</li>
+    </ul>
+    <h3>6の段</h3>
+    <ul>
+      <li>6 × 1 = 6。ろくいちがろく</li>
+      <li>6 × 2 = 12。ろくにじゅうに</li>
+      <li>6 × 3 = 18。ろくさんじゅうはち</li>
+      <li>6 × 4 = 24。ろくしにじゅうし</li>
+      <li>6 × 5 = 30。ろくごさんじゅう</li>
+      <li>6 × 6 = 36。ろくろくさんじゅうろく</li>
+      <li>6 × 7 = 42。ろくしちしじゅうに</li>
+      <li>6 × 8 = 48。ろくはしじゅうはち</li>
+      <li>6 × 9 = 54。ろっくごじゅうし</li>
+    </ul>
+    <h3>7の段</h3>
+    <ul>
+      <li>7 × 1 = 7。しちいちがしち</li>
+      <li>7 × 2 = 14。しちにじゅうし</li>
+      <li>7 × 3 = 21。しちさんにじゅういち</li>
+      <li>7 × 4 = 28。しちしにじゅうはち</li>
+      <li>7 × 5 = 35。しちごさんじゅうご</li>
+      <li>7 × 6 = 42。しちろくしじゅうに</li>
+      <li>7 × 7 = 49。しちしちしじゅうく</li>
+      <li>7 × 8 = 56。しちはごじゅうろく</li>
+      <li>7 × 9 = 63。しちくろくじゅうさん</li>
+    </ul>
+    <h3>8の段</h3>
+    <ul>
+      <li>8 × 1 = 8。はちいちがはち</li>
+      <li>8 × 2 = 16。はちにじゅうろく</li>
+      <li>8 × 3 = 24。はっさんにじゅうし</li>
+      <li>8 × 4 = 32。はっしさんじゅうに</li>
+      <li>8 × 5 = 40。はちごしじゅう</li>
+      <li>8 × 6 = 48。はちろくしじゅうはち</li>
+      <li>8 × 7 = 56。はちしちごじゅうろく</li>
+      <li>8 × 8 = 64。はっぱろくじゅうし</li>
+      <li>8 × 9 = 72。はっくしちじゅうに</li>
+    </ul>
+    <h3>9の段</h3>
+    <ul>
+      <li>9 × 1 = 9。くいちがく</li>
+      <li>9 × 2 = 18。くにじゅうはち</li>
+      <li>9 × 3 = 27。くさんにじゅうしち</li>
+      <li>9 × 4 = 36。くしさんじゅうろく</li>
+      <li>9 × 5 = 45。くごしじゅうご</li>
+      <li>9 × 6 = 54。くろくごじゅうし</li>
+      <li>9 × 7 = 63。くしちろくじゅうさん</li>
+      <li>9 × 8 = 72。くはしちじゅうに</li>
+      <li>9 × 9 = 81。くくはちじゅういち</li>
+    </ul>
+  </section>
+</dialog>
 <dialog id="card-detail-dialog" class="card-detail-dialog" aria-labelledby="card-detail-title" aria-describedby="card-detail-era card-detail-status">
   <button id="card-detail-close" class="card-detail-close" type="button">✕ 閉じる</button>
   <div id="card-detail-art-host"></div>
@@ -1043,7 +1174,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.4.4";
+const APP_VERSION = "v0.4.5";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],
@@ -4135,6 +4266,7 @@ async function restoreRoute(target,{allowCreate=false}={}) {
   await closeFormalRunner();
   if(runnerRouteRequest!==runnerRouteGeneration)return;
   closeFeedback();
+  closeKukuChart(false);
   closePlushDetail(false);
   $("card-detail-dialog").close();
   $("card-detail-art-host").replaceChildren();
@@ -5168,6 +5300,30 @@ $("card-preview-panel").addEventListener("toggle",event=>{
   if(event.target.open && !$("admin").classList.contains("hidden")) renderAdminCardPreview();
   else $("admin-card-preview").replaceChildren();
 });
+// 九九ひょうは閲覧だけ。DB、学習状態、ゲーム、History APIへ書き込まない。
+let kukuChartView=null;
+function openKukuChart() {
+  if($("home").classList.contains("hidden")||document.querySelector("dialog[open]"))return;
+  kukuChartView={x:window.scrollX,y:window.scrollY,top:document.body.style.top};
+  document.body.style.top=`-${window.scrollY}px`;
+  document.body.classList.add("kuku-chart-open");
+  $("kuku-chart-image").src="assets/kuku/kuku-chart.webp";
+  $("kuku-chart-dialog").showModal();
+  $("kuku-chart-close").focus({preventScroll:true});
+}
+function closeKukuChart(restoreFocus=true) {
+  const state=kukuChartView;kukuChartView=null;
+  if($("kuku-chart-dialog").open)$("kuku-chart-dialog").close();
+  if(!state)return;
+  document.body.classList.remove("kuku-chart-open");document.body.style.top=state.top;
+  window.scrollTo(state.x,state.y);
+  if(restoreFocus&&!$("home").classList.contains("hidden"))$("open-kuku-chart").focus({preventScroll:true});
+}
+$("open-kuku-chart").addEventListener("click",openKukuChart);
+$("kuku-chart-close").addEventListener("click",()=>closeKukuChart());
+$("kuku-chart-dialog").addEventListener("cancel",event=>{event.preventDefault();closeKukuChart();});
+$("kuku-chart-dialog").addEventListener("close",()=>{if(!$("kuku-chart-dialog").open)closeKukuChart();});
+
 $("card-detail-dialog").addEventListener("close", () => $("card-detail-art-host").replaceChildren());
 $("card-detail-close").addEventListener("click", () => $("card-detail-dialog").close());
 $("card-detail-dialog").addEventListener("click", event => {
