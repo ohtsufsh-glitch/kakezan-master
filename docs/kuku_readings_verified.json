@@ -1,0 +1,960 @@
+[
+  {
+    "id": "T01-01",
+    "a": 1,
+    "b": 1,
+    "expression": "1×1=1",
+    "answer": 1,
+    "reading": "いんいちがいち",
+    "display_lines": [
+      "いんいちが",
+      "いち"
+    ]
+  },
+  {
+    "id": "T01-02",
+    "a": 1,
+    "b": 2,
+    "expression": "1×2=2",
+    "answer": 2,
+    "reading": "いんにがに",
+    "display_lines": [
+      "いんにがに"
+    ]
+  },
+  {
+    "id": "T01-03",
+    "a": 1,
+    "b": 3,
+    "expression": "1×3=3",
+    "answer": 3,
+    "reading": "いんさんがさん",
+    "display_lines": [
+      "いんさんが",
+      "さん"
+    ]
+  },
+  {
+    "id": "T01-04",
+    "a": 1,
+    "b": 4,
+    "expression": "1×4=4",
+    "answer": 4,
+    "reading": "いんしがし",
+    "display_lines": [
+      "いんしがし"
+    ]
+  },
+  {
+    "id": "T01-05",
+    "a": 1,
+    "b": 5,
+    "expression": "1×5=5",
+    "answer": 5,
+    "reading": "いんごがご",
+    "display_lines": [
+      "いんごがご"
+    ]
+  },
+  {
+    "id": "T01-06",
+    "a": 1,
+    "b": 6,
+    "expression": "1×6=6",
+    "answer": 6,
+    "reading": "いんろくがろく",
+    "display_lines": [
+      "いんろくが",
+      "ろく"
+    ]
+  },
+  {
+    "id": "T01-07",
+    "a": 1,
+    "b": 7,
+    "expression": "1×7=7",
+    "answer": 7,
+    "reading": "いんしちがしち",
+    "display_lines": [
+      "いんしちが",
+      "しち"
+    ]
+  },
+  {
+    "id": "T01-08",
+    "a": 1,
+    "b": 8,
+    "expression": "1×8=8",
+    "answer": 8,
+    "reading": "いんはちがはち",
+    "display_lines": [
+      "いんはちが",
+      "はち"
+    ]
+  },
+  {
+    "id": "T01-09",
+    "a": 1,
+    "b": 9,
+    "expression": "1×9=9",
+    "answer": 9,
+    "reading": "いんくがく",
+    "display_lines": [
+      "いんくがく"
+    ]
+  },
+  {
+    "id": "T02-01",
+    "a": 2,
+    "b": 1,
+    "expression": "2×1=2",
+    "answer": 2,
+    "reading": "にいちがに",
+    "display_lines": [
+      "にいちがに"
+    ]
+  },
+  {
+    "id": "T02-02",
+    "a": 2,
+    "b": 2,
+    "expression": "2×2=4",
+    "answer": 4,
+    "reading": "ににんがし",
+    "display_lines": [
+      "ににんがし"
+    ]
+  },
+  {
+    "id": "T02-03",
+    "a": 2,
+    "b": 3,
+    "expression": "2×3=6",
+    "answer": 6,
+    "reading": "にさんがろく",
+    "display_lines": [
+      "にさんが",
+      "ろく"
+    ]
+  },
+  {
+    "id": "T02-04",
+    "a": 2,
+    "b": 4,
+    "expression": "2×4=8",
+    "answer": 8,
+    "reading": "にしがはち",
+    "display_lines": [
+      "にしがはち"
+    ]
+  },
+  {
+    "id": "T02-05",
+    "a": 2,
+    "b": 5,
+    "expression": "2×5=10",
+    "answer": 10,
+    "reading": "にごじゅう",
+    "display_lines": [
+      "にごじゅう"
+    ]
+  },
+  {
+    "id": "T02-06",
+    "a": 2,
+    "b": 6,
+    "expression": "2×6=12",
+    "answer": 12,
+    "reading": "にろくじゅうに",
+    "display_lines": [
+      "にろく",
+      "じゅうに"
+    ]
+  },
+  {
+    "id": "T02-07",
+    "a": 2,
+    "b": 7,
+    "expression": "2×7=14",
+    "answer": 14,
+    "reading": "にしちじゅうし",
+    "display_lines": [
+      "にしち",
+      "じゅうし"
+    ]
+  },
+  {
+    "id": "T02-08",
+    "a": 2,
+    "b": 8,
+    "expression": "2×8=16",
+    "answer": 16,
+    "reading": "にはちじゅうろく",
+    "display_lines": [
+      "にはち",
+      "じゅうろく"
+    ]
+  },
+  {
+    "id": "T02-09",
+    "a": 2,
+    "b": 9,
+    "expression": "2×9=18",
+    "answer": 18,
+    "reading": "にくじゅうはち",
+    "display_lines": [
+      "にく",
+      "じゅうはち"
+    ]
+  },
+  {
+    "id": "T03-01",
+    "a": 3,
+    "b": 1,
+    "expression": "3×1=3",
+    "answer": 3,
+    "reading": "さんいちがさん",
+    "display_lines": [
+      "さんいちが",
+      "さん"
+    ]
+  },
+  {
+    "id": "T03-02",
+    "a": 3,
+    "b": 2,
+    "expression": "3×2=6",
+    "answer": 6,
+    "reading": "さんにがろく",
+    "display_lines": [
+      "さんにが",
+      "ろく"
+    ]
+  },
+  {
+    "id": "T03-03",
+    "a": 3,
+    "b": 3,
+    "expression": "3×3=9",
+    "answer": 9,
+    "reading": "さざんがく",
+    "display_lines": [
+      "さざんがく"
+    ]
+  },
+  {
+    "id": "T03-04",
+    "a": 3,
+    "b": 4,
+    "expression": "3×4=12",
+    "answer": 12,
+    "reading": "さんしじゅうに",
+    "display_lines": [
+      "さんし",
+      "じゅうに"
+    ]
+  },
+  {
+    "id": "T03-05",
+    "a": 3,
+    "b": 5,
+    "expression": "3×5=15",
+    "answer": 15,
+    "reading": "さんごじゅうご",
+    "display_lines": [
+      "さんご",
+      "じゅうご"
+    ]
+  },
+  {
+    "id": "T03-06",
+    "a": 3,
+    "b": 6,
+    "expression": "3×6=18",
+    "answer": 18,
+    "reading": "さぶろくじゅうはち",
+    "display_lines": [
+      "さぶろく",
+      "じゅうはち"
+    ]
+  },
+  {
+    "id": "T03-07",
+    "a": 3,
+    "b": 7,
+    "expression": "3×7=21",
+    "answer": 21,
+    "reading": "さんしちにじゅういち",
+    "display_lines": [
+      "さんしち",
+      "にじゅういち"
+    ]
+  },
+  {
+    "id": "T03-08",
+    "a": 3,
+    "b": 8,
+    "expression": "3×8=24",
+    "answer": 24,
+    "reading": "さんぱにじゅうし",
+    "display_lines": [
+      "さんぱ",
+      "にじゅうし"
+    ]
+  },
+  {
+    "id": "T03-09",
+    "a": 3,
+    "b": 9,
+    "expression": "3×9=27",
+    "answer": 27,
+    "reading": "さんくにじゅうしち",
+    "display_lines": [
+      "さんく",
+      "にじゅうしち"
+    ]
+  },
+  {
+    "id": "T04-01",
+    "a": 4,
+    "b": 1,
+    "expression": "4×1=4",
+    "answer": 4,
+    "reading": "しいちがし",
+    "display_lines": [
+      "しいちがし"
+    ]
+  },
+  {
+    "id": "T04-02",
+    "a": 4,
+    "b": 2,
+    "expression": "4×2=8",
+    "answer": 8,
+    "reading": "しにがはち",
+    "display_lines": [
+      "しにがはち"
+    ]
+  },
+  {
+    "id": "T04-03",
+    "a": 4,
+    "b": 3,
+    "expression": "4×3=12",
+    "answer": 12,
+    "reading": "しさんじゅうに",
+    "display_lines": [
+      "しさん",
+      "じゅうに"
+    ]
+  },
+  {
+    "id": "T04-04",
+    "a": 4,
+    "b": 4,
+    "expression": "4×4=16",
+    "answer": 16,
+    "reading": "ししじゅうろく",
+    "display_lines": [
+      "しし",
+      "じゅうろく"
+    ]
+  },
+  {
+    "id": "T04-05",
+    "a": 4,
+    "b": 5,
+    "expression": "4×5=20",
+    "answer": 20,
+    "reading": "しごにじゅう",
+    "display_lines": [
+      "しご",
+      "にじゅう"
+    ]
+  },
+  {
+    "id": "T04-06",
+    "a": 4,
+    "b": 6,
+    "expression": "4×6=24",
+    "answer": 24,
+    "reading": "しろくにじゅうし",
+    "display_lines": [
+      "しろく",
+      "にじゅうし"
+    ]
+  },
+  {
+    "id": "T04-07",
+    "a": 4,
+    "b": 7,
+    "expression": "4×7=28",
+    "answer": 28,
+    "reading": "ししちにじゅうはち",
+    "display_lines": [
+      "ししち",
+      "にじゅうはち"
+    ]
+  },
+  {
+    "id": "T04-08",
+    "a": 4,
+    "b": 8,
+    "expression": "4×8=32",
+    "answer": 32,
+    "reading": "しはさんじゅうに",
+    "display_lines": [
+      "しは",
+      "さんじゅうに"
+    ]
+  },
+  {
+    "id": "T04-09",
+    "a": 4,
+    "b": 9,
+    "expression": "4×9=36",
+    "answer": 36,
+    "reading": "しくさんじゅうろく",
+    "display_lines": [
+      "しく",
+      "さんじゅうろく"
+    ]
+  },
+  {
+    "id": "T05-01",
+    "a": 5,
+    "b": 1,
+    "expression": "5×1=5",
+    "answer": 5,
+    "reading": "ごいちがご",
+    "display_lines": [
+      "ごいちがご"
+    ]
+  },
+  {
+    "id": "T05-02",
+    "a": 5,
+    "b": 2,
+    "expression": "5×2=10",
+    "answer": 10,
+    "reading": "ごにじゅう",
+    "display_lines": [
+      "ごにじゅう"
+    ]
+  },
+  {
+    "id": "T05-03",
+    "a": 5,
+    "b": 3,
+    "expression": "5×3=15",
+    "answer": 15,
+    "reading": "ごさんじゅうご",
+    "display_lines": [
+      "ごさん",
+      "じゅうご"
+    ]
+  },
+  {
+    "id": "T05-04",
+    "a": 5,
+    "b": 4,
+    "expression": "5×4=20",
+    "answer": 20,
+    "reading": "ごしにじゅう",
+    "display_lines": [
+      "ごし",
+      "にじゅう"
+    ]
+  },
+  {
+    "id": "T05-05",
+    "a": 5,
+    "b": 5,
+    "expression": "5×5=25",
+    "answer": 25,
+    "reading": "ごごにじゅうご",
+    "display_lines": [
+      "ごご",
+      "にじゅうご"
+    ]
+  },
+  {
+    "id": "T05-06",
+    "a": 5,
+    "b": 6,
+    "expression": "5×6=30",
+    "answer": 30,
+    "reading": "ごろくさんじゅう",
+    "display_lines": [
+      "ごろく",
+      "さんじゅう"
+    ]
+  },
+  {
+    "id": "T05-07",
+    "a": 5,
+    "b": 7,
+    "expression": "5×7=35",
+    "answer": 35,
+    "reading": "ごしちさんじゅうご",
+    "display_lines": [
+      "ごしち",
+      "さんじゅうご"
+    ]
+  },
+  {
+    "id": "T05-08",
+    "a": 5,
+    "b": 8,
+    "expression": "5×8=40",
+    "answer": 40,
+    "reading": "ごはしじゅう",
+    "display_lines": [
+      "ごは",
+      "しじゅう"
+    ]
+  },
+  {
+    "id": "T05-09",
+    "a": 5,
+    "b": 9,
+    "expression": "5×9=45",
+    "answer": 45,
+    "reading": "ごっくしじゅうご",
+    "display_lines": [
+      "ごっく",
+      "しじゅうご"
+    ]
+  },
+  {
+    "id": "T06-01",
+    "a": 6,
+    "b": 1,
+    "expression": "6×1=6",
+    "answer": 6,
+    "reading": "ろくいちがろく",
+    "display_lines": [
+      "ろくいちが",
+      "ろく"
+    ]
+  },
+  {
+    "id": "T06-02",
+    "a": 6,
+    "b": 2,
+    "expression": "6×2=12",
+    "answer": 12,
+    "reading": "ろくにじゅうに",
+    "display_lines": [
+      "ろくに",
+      "じゅうに"
+    ]
+  },
+  {
+    "id": "T06-03",
+    "a": 6,
+    "b": 3,
+    "expression": "6×3=18",
+    "answer": 18,
+    "reading": "ろくさんじゅうはち",
+    "display_lines": [
+      "ろくさん",
+      "じゅうはち"
+    ]
+  },
+  {
+    "id": "T06-04",
+    "a": 6,
+    "b": 4,
+    "expression": "6×4=24",
+    "answer": 24,
+    "reading": "ろくしにじゅうし",
+    "display_lines": [
+      "ろくし",
+      "にじゅうし"
+    ]
+  },
+  {
+    "id": "T06-05",
+    "a": 6,
+    "b": 5,
+    "expression": "6×5=30",
+    "answer": 30,
+    "reading": "ろくごさんじゅう",
+    "display_lines": [
+      "ろくご",
+      "さんじゅう"
+    ]
+  },
+  {
+    "id": "T06-06",
+    "a": 6,
+    "b": 6,
+    "expression": "6×6=36",
+    "answer": 36,
+    "reading": "ろくろくさんじゅうろく",
+    "display_lines": [
+      "ろくろく",
+      "さんじゅうろく"
+    ]
+  },
+  {
+    "id": "T06-07",
+    "a": 6,
+    "b": 7,
+    "expression": "6×7=42",
+    "answer": 42,
+    "reading": "ろくしちしじゅうに",
+    "display_lines": [
+      "ろくしち",
+      "しじゅうに"
+    ]
+  },
+  {
+    "id": "T06-08",
+    "a": 6,
+    "b": 8,
+    "expression": "6×8=48",
+    "answer": 48,
+    "reading": "ろくはしじゅうはち",
+    "display_lines": [
+      "ろくは",
+      "しじゅうはち"
+    ]
+  },
+  {
+    "id": "T06-09",
+    "a": 6,
+    "b": 9,
+    "expression": "6×9=54",
+    "answer": 54,
+    "reading": "ろっくごじゅうし",
+    "display_lines": [
+      "ろっく",
+      "ごじゅうし"
+    ]
+  },
+  {
+    "id": "T07-01",
+    "a": 7,
+    "b": 1,
+    "expression": "7×1=7",
+    "answer": 7,
+    "reading": "しちいちがしち",
+    "display_lines": [
+      "しちいちが",
+      "しち"
+    ]
+  },
+  {
+    "id": "T07-02",
+    "a": 7,
+    "b": 2,
+    "expression": "7×2=14",
+    "answer": 14,
+    "reading": "しちにじゅうし",
+    "display_lines": [
+      "しちに",
+      "じゅうし"
+    ]
+  },
+  {
+    "id": "T07-03",
+    "a": 7,
+    "b": 3,
+    "expression": "7×3=21",
+    "answer": 21,
+    "reading": "しちさんにじゅういち",
+    "display_lines": [
+      "しちさん",
+      "にじゅういち"
+    ]
+  },
+  {
+    "id": "T07-04",
+    "a": 7,
+    "b": 4,
+    "expression": "7×4=28",
+    "answer": 28,
+    "reading": "しちしにじゅうはち",
+    "display_lines": [
+      "しちし",
+      "にじゅうはち"
+    ]
+  },
+  {
+    "id": "T07-05",
+    "a": 7,
+    "b": 5,
+    "expression": "7×5=35",
+    "answer": 35,
+    "reading": "しちごさんじゅうご",
+    "display_lines": [
+      "しちご",
+      "さんじゅうご"
+    ]
+  },
+  {
+    "id": "T07-06",
+    "a": 7,
+    "b": 6,
+    "expression": "7×6=42",
+    "answer": 42,
+    "reading": "しちろくしじゅうに",
+    "display_lines": [
+      "しちろく",
+      "しじゅうに"
+    ]
+  },
+  {
+    "id": "T07-07",
+    "a": 7,
+    "b": 7,
+    "expression": "7×7=49",
+    "answer": 49,
+    "reading": "しちしちしじゅうく",
+    "display_lines": [
+      "しちしち",
+      "しじゅうく"
+    ]
+  },
+  {
+    "id": "T07-08",
+    "a": 7,
+    "b": 8,
+    "expression": "7×8=56",
+    "answer": 56,
+    "reading": "しちはごじゅうろく",
+    "display_lines": [
+      "しちは",
+      "ごじゅうろく"
+    ]
+  },
+  {
+    "id": "T07-09",
+    "a": 7,
+    "b": 9,
+    "expression": "7×9=63",
+    "answer": 63,
+    "reading": "しちくろくじゅうさん",
+    "display_lines": [
+      "しちく",
+      "ろくじゅうさん"
+    ]
+  },
+  {
+    "id": "T08-01",
+    "a": 8,
+    "b": 1,
+    "expression": "8×1=8",
+    "answer": 8,
+    "reading": "はちいちがはち",
+    "display_lines": [
+      "はちいちが",
+      "はち"
+    ]
+  },
+  {
+    "id": "T08-02",
+    "a": 8,
+    "b": 2,
+    "expression": "8×2=16",
+    "answer": 16,
+    "reading": "はちにじゅうろく",
+    "display_lines": [
+      "はちに",
+      "じゅうろく"
+    ]
+  },
+  {
+    "id": "T08-03",
+    "a": 8,
+    "b": 3,
+    "expression": "8×3=24",
+    "answer": 24,
+    "reading": "はっさんにじゅうし",
+    "display_lines": [
+      "はっさん",
+      "にじゅうし"
+    ]
+  },
+  {
+    "id": "T08-04",
+    "a": 8,
+    "b": 4,
+    "expression": "8×4=32",
+    "answer": 32,
+    "reading": "はっしさんじゅうに",
+    "display_lines": [
+      "はっし",
+      "さんじゅうに"
+    ]
+  },
+  {
+    "id": "T08-05",
+    "a": 8,
+    "b": 5,
+    "expression": "8×5=40",
+    "answer": 40,
+    "reading": "はちごしじゅう",
+    "display_lines": [
+      "はちご",
+      "しじゅう"
+    ]
+  },
+  {
+    "id": "T08-06",
+    "a": 8,
+    "b": 6,
+    "expression": "8×6=48",
+    "answer": 48,
+    "reading": "はちろくしじゅうはち",
+    "display_lines": [
+      "はちろく",
+      "しじゅうはち"
+    ]
+  },
+  {
+    "id": "T08-07",
+    "a": 8,
+    "b": 7,
+    "expression": "8×7=56",
+    "answer": 56,
+    "reading": "はちしちごじゅうろく",
+    "display_lines": [
+      "はちしち",
+      "ごじゅうろく"
+    ]
+  },
+  {
+    "id": "T08-08",
+    "a": 8,
+    "b": 8,
+    "expression": "8×8=64",
+    "answer": 64,
+    "reading": "はっぱろくじゅうし",
+    "display_lines": [
+      "はっぱ",
+      "ろくじゅうし"
+    ]
+  },
+  {
+    "id": "T08-09",
+    "a": 8,
+    "b": 9,
+    "expression": "8×9=72",
+    "answer": 72,
+    "reading": "はっくしちじゅうに",
+    "display_lines": [
+      "はっく",
+      "しちじゅうに"
+    ]
+  },
+  {
+    "id": "T09-01",
+    "a": 9,
+    "b": 1,
+    "expression": "9×1=9",
+    "answer": 9,
+    "reading": "くいちがく",
+    "display_lines": [
+      "くいちがく"
+    ]
+  },
+  {
+    "id": "T09-02",
+    "a": 9,
+    "b": 2,
+    "expression": "9×2=18",
+    "answer": 18,
+    "reading": "くにじゅうはち",
+    "display_lines": [
+      "くに",
+      "じゅうはち"
+    ]
+  },
+  {
+    "id": "T09-03",
+    "a": 9,
+    "b": 3,
+    "expression": "9×3=27",
+    "answer": 27,
+    "reading": "くさんにじゅうしち",
+    "display_lines": [
+      "くさん",
+      "にじゅうしち"
+    ]
+  },
+  {
+    "id": "T09-04",
+    "a": 9,
+    "b": 4,
+    "expression": "9×4=36",
+    "answer": 36,
+    "reading": "くしさんじゅうろく",
+    "display_lines": [
+      "くし",
+      "さんじゅうろく"
+    ]
+  },
+  {
+    "id": "T09-05",
+    "a": 9,
+    "b": 5,
+    "expression": "9×5=45",
+    "answer": 45,
+    "reading": "くごしじゅうご",
+    "display_lines": [
+      "くご",
+      "しじゅうご"
+    ]
+  },
+  {
+    "id": "T09-06",
+    "a": 9,
+    "b": 6,
+    "expression": "9×6=54",
+    "answer": 54,
+    "reading": "くろくごじゅうし",
+    "display_lines": [
+      "くろく",
+      "ごじゅうし"
+    ]
+  },
+  {
+    "id": "T09-07",
+    "a": 9,
+    "b": 7,
+    "expression": "9×7=63",
+    "answer": 63,
+    "reading": "くしちろくじゅうさん",
+    "display_lines": [
+      "くしち",
+      "ろくじゅうさん"
+    ]
+  },
+  {
+    "id": "T09-08",
+    "a": 9,
+    "b": 8,
+    "expression": "9×8=72",
+    "answer": 72,
+    "reading": "くはしちじゅうに",
+    "display_lines": [
+      "くは",
+      "しちじゅうに"
+    ]
+  },
+  {
+    "id": "T09-09",
+    "a": 9,
+    "b": 9,
+    "expression": "9×9=81",
+    "answer": 81,
+    "reading": "くくはちじゅういち",
+    "display_lines": [
+      "くく",
+      "はちじゅういち"
+    ]
+  }
+]
