@@ -72,8 +72,13 @@ class MultiplicationTest(unittest.TestCase):
             self.assertTrue(self.page.evaluate('async()=>{const d=await snapshotAllStores();return !!validateBackup({backupFormat:BACKUP_FORMAT,backupVersion:BACKUP_VERSION,data:d});}'))
             self.page.locator('#next').click()
             self.page.wait_for_function('currentSession.phase==="complete" || (quizReady&&phase==="question")')
-        self.assertEqual(self.page.locator('#study-result-summary').inner_text(),'20もん ぜんぶ せいかい')
-        self.assertEqual(self.page.locator('#study-result-score').inner_text(),'100てん！')
+        self.assertEqual(self.page.evaluate('currentSession.results.length'),20)
+        self.assertTrue(self.page.evaluate('currentSession.results.every(r=>r.correct)'))
+        self.assertTrue(self.page.locator('#study-result-summary').is_hidden())
+        self.assertTrue(self.page.locator('#study-result-score').is_hidden())
+        self.assertEqual(self.page.locator('#study-result-reward img').get_attribute('alt'),
+                         '100点満点！20問すべて正解です。猫とうさぎがお祝いしています。')
+        self.assertTrue(self.page.locator('#study-result-reward img').is_visible())
         self.assertEqual(len(self.page.evaluate("readAll('answers')")),20)
         self.assertEqual(self.errors,[])
 
