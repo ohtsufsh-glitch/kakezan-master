@@ -391,14 +391,48 @@
     #genre-dashboard:active { box-shadow:0 1px 0 #efccda; }
     .test-card-title { font-size:1.3rem; font-weight:800; }
     .test-card-intro { margin-top:12px; line-height:1.6; }
-    .test-card-full { margin:12px 0; font-size:1.4rem; color:#a52b60; }
+    #genre-dashboard:not(.test-card-legacy) .test-card-intro { word-break:keep-all; text-wrap:balance; }
+    .test-card-full { margin:12px 0; font-size:.9rem; color:#a52b60; }
+    .test-card-legacy .test-card-full { font-size:1.4rem; }
     .test-card-action { padding:12px 8px; border-radius:12px; background:#a52b60; color:#fff; font-weight:750; line-height:1.6; }
     .test-card-note { margin-top:12px; font-size:.8rem; line-height:1.6; }
-    #study-finished.test-result { text-align:center; border:2px solid #edbed0; background:linear-gradient(#fff7fb,#fff); padding-block:28px; overflow-wrap:anywhere; }
-    #study-result-score { margin:24px 0; color:#a52b60; font-size:clamp(3rem,15vw,6rem); font-weight:900; line-height:1.35; }
-    .test-result #study-result-summary { font-size:1.2rem; font-weight:750; }
-    .test-result #study-result-remaining { margin-bottom:28px; }
-    .test-result #study-last-result { text-align:left; }
+    #study-finished.test-result { text-align:center; border:2px solid #edbed0; background:linear-gradient(#fff1f7,#fffafb); padding-block:24px; overflow-wrap:anywhere; }
+    #study-finished.test-result-perfect {
+      border-color:#dfad4c;
+      background:radial-gradient(ellipse at 50% 28%,#ffefb9,transparent 72%),linear-gradient(#fff1f7,#fffafb);
+    }
+    .test-result #study-result-title { margin:0 0 8px; color:#78364f; }
+    #study-result-score { margin:8px 0; color:#a52b60; font-size:clamp(3rem,15vw,6rem); font-weight:900; line-height:1.15; }
+    .test-result-perfect #study-result-score { color:#8a4e00; }
+    .test-result-stars {
+      display:flex; justify-content:space-between; max-width:16rem; margin:0 auto;
+      color:#bd7609; font-size:1.4rem; line-height:1; pointer-events:none;
+    }
+    @media (prefers-reduced-motion:no-preference) {
+      .test-result-stars span { animation:test-result-star-pop 1.4s ease-out; }
+      .test-result-stars span + span { animation-delay:.15s; }
+    }
+    @keyframes test-result-star-pop {
+      0% { opacity:.45; transform:scale(.65) rotate(-18deg); }
+      35% { opacity:1; transform:scale(1.25) rotate(10deg); }
+      100% { opacity:1; transform:none; }
+    }
+    #study-result-correct { margin:0; font-size:1.3rem; font-weight:800; }
+    .test-result #study-result-summary { margin:2px 0 0; color:#664951; font-size:.9rem; }
+    .test-result #study-result-remaining { margin:12px 0 0; font-weight:700; white-space:pre-line; }
+    .test-result #study-again { min-height:44px; margin:16px 0 8px; background:#a52b60; }
+    .test-result #study-home { border-color:#d59bb2; color:#78364f; }
+    @media (orientation:landscape) and (max-height:500px) {
+      #study-finished.test-result { padding-block:8px; }
+      .test-result #study-result-title { margin-bottom:2px; }
+      .test-result-stars { font-size:1.1rem; }
+      .test-result #study-result-score { font-size:3rem; margin:2px 0; line-height:1.05; }
+      .test-result p { line-height:1.35; }
+      .test-result #study-result-remaining { margin-top:4px; }
+      .test-result #study-again, .test-result #study-home {
+        display:inline-block; vertical-align:middle; width:auto; max-width:100%; margin:6px 2px 0; padding:8px 14px;
+      }
+    }
     .home-genre-heading {
       display:flex;
       align-items:center;
@@ -737,10 +771,10 @@
         </div>
         <button id="genre-dashboard" class="genre-panel home-genre" type="button" aria-label="かけざんテスト、20問、100点満点、開始">
           <span class="test-card-title">📝 かけざんテスト</span>
-          <span class="test-card-intro">20もんに ちょうせん！</span>
-          <strong class="test-card-full">100てん まんてん</strong>
+          <span class="test-card-intro">20もん といて、なんてん とれるかな？</span>
+          <strong class="test-card-full">⭐ 100てん まんてん ⭐</strong>
           <span id="test-card-action" class="test-card-action">テストを はじめる！</span>
-          <span id="test-card-note" class="test-card-note">81もんから ランダムに しゅつだい</span>
+          <span id="test-card-note" class="test-card-note hidden">以前の10問セットです。おわったら新しいテストへ！</span>
         </button>
       </div>
     </div>
@@ -1035,7 +1069,9 @@
 
   <section id="study-finished" class="card hidden" aria-labelledby="study-result-title">
     <h2 id="study-result-title"></h2>
+    <div id="study-result-stars" class="test-result-stars hidden" aria-hidden="true"><span>✦</span><span>✦</span></div>
     <p id="study-result-score" class="hidden"></p>
+    <p id="study-result-correct" class="hidden"></p>
     <p id="study-result-summary"></p>
     <p id="study-result-remaining"></p>
     <div id="study-last-result" class="result hidden" aria-live="polite"></div>
@@ -1195,7 +1231,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.4.6";
+const APP_VERSION = "v0.4.7";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],
@@ -2178,12 +2214,14 @@ function genreMasteryStats(tag, progressByQuestion) {
 function renderGenreDashboard(set) {
   const legacy=set&&set.entries.length<=10;
   const action=set ? set.phase==="complete" ? "けっかを もういちどみる" : legacy ? "以前の10問セットを再開" : "テストを つづける！" : "テストを はじめる！";
-  $("genre-dashboard").querySelector(".test-card-title").textContent=legacy?"📝 以前の10問セット":"📝 かけざんテスト";
-  $("genre-dashboard").querySelector(".test-card-intro").textContent=legacy?"前のつづきから はじめよう！":"20もんに ちょうせん！";
-  $("genre-dashboard").querySelector(".test-card-full").textContent=legacy?"おわったら 20もんテストへ":"100てん まんてん";
+  const card=$("genre-dashboard");
+  card.classList.toggle("test-card-legacy",!!legacy);
+  card.querySelector(".test-card-title").textContent=legacy?"📝 以前の10問セット":"📝 かけざんテスト";
+  card.querySelector(".test-card-intro").textContent=legacy?"前のつづきから はじめよう！":"20もん といて、なんてん とれるかな？";
+  card.querySelector(".test-card-full").textContent=legacy?"おわったら 20もんテストへ":"⭐ 100てん まんてん ⭐";
   $("test-card-action").textContent=action;
-  $("test-card-note").textContent=legacy ? "以前の10問セットです。おわったら新しいテストへ！" : "81もんから ランダムに しゅつだい";
-  $("genre-dashboard").setAttribute("aria-label",legacy ? `以前の10問セット、${action}` : `かけざんテスト、20問、100点満点、${action}`);
+  $("test-card-note").classList.toggle("hidden",!legacy);
+  card.setAttribute("aria-label",legacy ? `以前の10問セット、${action}` : `かけざんテスト、20問、100点満点、${action}`);
 }
 
 function titleForMastery(stats) {
@@ -4659,17 +4697,24 @@ async function restoreStudy(mode,genre,ctx=viewContext()) {
   if(set.phase==="complete") {
     quizReady=false;currentQuestion=null;currentProgress=null;
     const test=isMultiplicationTest(set);
-    $("study-finished").classList.toggle("test-result",test);
-    $("study-result-title").textContent=test?"🎉 かけざんテスト けっかはっぴょう！":`${studySetLabel(set)} セット結果`;
     const count=set.results.length,correct=set.results.filter(r=>r.correct).length;
+    const perfect=test&&correct===20;
+    $("study-finished").classList.toggle("test-result",test);
+    $("study-finished").classList.toggle("test-result-perfect",perfect);
+    $("study-result-title").textContent=test?(perfect?"🎉 テストの けっか 🎉":"🌸 テストの けっか"):`${studySetLabel(set)} セット結果`;
+    $("study-result-stars").classList.toggle("hidden",!perfect);
     $("study-result-score").classList.toggle("hidden",!test);
     $("study-result-score").textContent=test?`${correct*5}てん！`:"";
-    $("study-result-summary").textContent=test?`20もんちゅう ${correct}もん せいかい`:`回答数 ${count}問 ｜ 正解数 ${correct}問 ｜ 正答率 ${count?Math.round(correct/count*100):0}%`;
-    $("study-again").textContent=mode==="mix"?"もういちどテスト":"もう1セット挑戦";
-    $("study-home").textContent=mode==="mix"?"ホームへもどる":"学習ホームへ戻る";
+    $("study-result-correct").classList.toggle("hidden",!test);
+    $("study-result-correct").textContent=test?(perfect?"ぜんぶ せいかい！":`${correct}もん せいかい！`):"";
+    $("study-result-summary").textContent=test?(perfect?"20もん ぜんぶ せいかい":`20もんちゅう ${correct}もん せいかい`):`回答数 ${count}問 ｜ 正解数 ${correct}問 ｜ 正答率 ${count?Math.round(correct/count*100):0}%`;
+    $("study-again").textContent=test?"もういちど テスト":mode==="mix"?"もういちどテスト":"もう1セット挑戦";
+    $("study-home").textContent=test?"ホームへ もどる":mode==="mix"?"ホームへもどる":"学習ホームへ戻る";
     const remaining=studyCandidates(mode,genre,activeQuestions,activeProgressRecords).length;
     let message;
-    if(test) message=correct===20 ? "ぜんもん せいかい！ よく がんばったね！" : correct>=10 ? "さいごまで がんばったね！ また ちょうせんしよう！" : "20もんに ちょうせんできたね！ いっしょに れんしゅうしていこう！";
+    if(test) message=perfect?"100てん おめでとう！":
+      correct>=16?"すごい！ よくがんばったね！":
+      correct>=10?"さいごまで よくがんばったね！":"20もんに ちょうせんできたね！\nまた やってみよう！";
     else if(mode==="mix") message="以前の10問セットが おわったよ！ つぎは20もんの かけざんテストに ちょうせん！";
     else message=remaining?`現在残っている苦手問題：${remaining}問`:"🎉 苦手問題をすべて克服したよ！ 未挑戦の問題は段別・かけざんテストで学ぼう。";
     $("study-result-remaining").textContent=message;
@@ -4681,7 +4726,7 @@ async function restoreStudy(mode,genre,ctx=viewContext()) {
     if(q) {
       currentQuestion=q;currentEra=q.era;numericInput=String(last.answer);
       lastCoinAward={amount:set.coinAward||0,stages:set.coinStages||[]};
-      showResult(null,lastCoinAward,$("study-last-result"));
+      if(!test)showResult(null,lastCoinAward,$("study-last-result"));
     }
     show("study-finished");return true;
   }
