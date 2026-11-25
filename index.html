@@ -403,20 +403,9 @@
     }
     .test-result #study-result-title { margin:0 0 8px; color:#78364f; }
     #study-result-score { margin:8px 0; color:#a52b60; font-size:clamp(3rem,15vw,6rem); font-weight:900; line-height:1.15; }
-    .test-result-perfect #study-result-score { color:#8a4e00; }
-    .test-result-stars {
-      display:flex; justify-content:space-between; max-width:16rem; margin:0 auto;
-      color:#bd7609; font-size:1.4rem; line-height:1; pointer-events:none;
-    }
-    @media (prefers-reduced-motion:no-preference) {
-      .test-result-stars span { animation:test-result-star-pop 1.4s ease-out; }
-      .test-result-stars span + span { animation-delay:.15s; }
-    }
-    @keyframes test-result-star-pop {
-      0% { opacity:.45; transform:scale(.65) rotate(-18deg); }
-      35% { opacity:1; transform:scale(1.25) rotate(10deg); }
-      100% { opacity:1; transform:none; }
-    }
+    #study-result-reward { width:min(100%,576px); aspect-ratio:3 / 2; margin:12px auto 0; }
+    #study-result-reward img { display:block; width:100%; height:100%; object-fit:contain; }
+    .test-reward-fallback { display:grid; place-items:center; width:100%; height:100%; margin:0; color:#8a4e00; font-size:clamp(2rem,12vw,5rem); font-weight:900; }
     #study-result-correct { margin:0; font-size:1.3rem; font-weight:800; }
     .test-result #study-result-summary { margin:2px 0 0; color:#664951; font-size:.9rem; }
     .test-result #study-result-remaining { margin:12px 0 0; font-weight:700; white-space:pre-line; }
@@ -433,7 +422,7 @@
     @media (orientation:landscape) and (max-height:500px) {
       #study-finished.test-result { padding-block:8px; }
       .test-result #study-result-title { margin-bottom:2px; }
-      .test-result-stars { font-size:1.1rem; }
+      #study-result-reward { width:min(100%,576px,75vh); width:min(100%,576px,75svh); }
       .test-result #study-result-score { font-size:3rem; margin:2px 0; line-height:1.05; }
       .test-result p { line-height:1.35; }
       .test-result #study-result-remaining { margin-top:4px; }
@@ -1077,7 +1066,7 @@
 
   <section id="study-finished" class="card hidden" aria-labelledby="study-result-title">
     <h2 id="study-result-title"></h2>
-    <div id="study-result-stars" class="test-result-stars hidden" aria-hidden="true"><span>✦</span><span>✦</span></div>
+    <div id="study-result-reward" class="hidden"></div>
     <p id="study-result-score" class="hidden"></p>
     <p id="study-result-correct" class="hidden"></p>
     <p id="study-result-summary"></p>
@@ -1243,7 +1232,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.4.8";
+const APP_VERSION = "v0.4.9";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],
@@ -4713,19 +4702,34 @@ async function restoreStudy(mode,genre,ctx=viewContext()) {
     const perfect=test&&correct===20;
     $("study-finished").classList.toggle("test-result",test);
     $("study-finished").classList.toggle("test-result-perfect",perfect);
-    $("study-result-title").textContent=test?(perfect?"🎉 テストの けっか 🎉":"🌸 テストの けっか"):`${studySetLabel(set)} セット結果`;
-    $("study-result-stars").classList.toggle("hidden",!perfect);
-    $("study-result-score").classList.toggle("hidden",!test);
-    $("study-result-score").textContent=test?`${correct*5}てん！`:"";
-    $("study-result-correct").classList.toggle("hidden",!test);
-    $("study-result-correct").textContent=test?(perfect?"ぜんぶ せいかい！":`${correct}もん せいかい！`):"";
-    $("study-result-summary").classList.toggle("hidden",test&&!perfect);
-    $("study-result-summary").textContent=test?(perfect?"20もん ぜんぶ せいかい":""):`回答数 ${count}問 ｜ 正解数 ${correct}問 ｜ 正答率 ${count?Math.round(correct/count*100):0}%`;
+    $("study-result-title").textContent=test?(perfect?"🎉 テストの けっか":"🌸 テストの けっか"):`${studySetLabel(set)} セット結果`;
+    const reward=$("study-result-reward");
+    reward.replaceChildren();reward.classList.toggle("hidden",!perfect);
+    if(perfect) {
+      const image=document.createElement("img");
+      image.width=1536;image.height=1024;
+      image.alt="100点満点！20問すべて正解です。猫とうさぎがお祝いしています。";
+      image.onerror=()=>{
+        const fallback=document.createElement("p");
+        fallback.className="test-reward-fallback";fallback.textContent="100てん！";
+        fallback.setAttribute("role","img");
+        fallback.setAttribute("aria-label","100点満点！20問すべて正解です。");
+        image.replaceWith(fallback);
+      };
+      image.src="assets/rewards/kakezan_100ten_reward.webp";
+      reward.append(image);
+    }
+    $("study-result-score").classList.toggle("hidden",!test||perfect);
+    $("study-result-score").textContent=test&&!perfect?`${correct*5}てん！`:"";
+    $("study-result-correct").classList.toggle("hidden",!test||perfect);
+    $("study-result-correct").textContent=test&&!perfect?`${correct}もん せいかい！`:"";
+    $("study-result-summary").classList.toggle("hidden",test);
+    $("study-result-summary").textContent=test?"":`回答数 ${count}問 ｜ 正解数 ${correct}問 ｜ 正答率 ${count?Math.round(correct/count*100):0}%`;
     $("study-again").textContent=test?"もういちど テスト":mode==="mix"?"もういちどテスト":"もう1セット挑戦";
     $("study-home").textContent=test?"ホームへ もどる":mode==="mix"?"ホームへもどる":"学習ホームへ戻る";
     const remaining=studyCandidates(mode,genre,activeQuestions,activeProgressRecords).length;
     let message;
-    if(test) message=perfect?"100てん おめでとう！":
+    if(test) message=perfect?"やったね！":
       correct>=16?"すごい！ よくがんばったね！":
       correct>=10?"さいごまで よくがんばったね！":"20もんに ちょうせんできたね！\nまた やってみよう！";
     else if(mode==="mix") message="以前の10問セットが おわったよ！ つぎは20もんの かけざんテストに ちょうせん！";

@@ -45,6 +45,30 @@ class MultiplicationExamTest(unittest.TestCase):
             self.assertEqual(self.page.locator('#study-mistakes-title').inner_text(),
                              'まちがえた もんだいを かくにんしよう！')
 
+    def assert_exam_score(self, correct):
+        self.page.locator('#study-finished').wait_for(state='visible')
+        self.assertEqual(self.page.evaluate('currentSession.results.length'),20)
+        self.assertEqual(self.page.evaluate('currentSession.results.filter(r=>r.correct).length'),correct)
+        reward=self.page.locator('#study-result-reward')
+        self.assertEqual(reward.is_visible(),correct==20)
+        self.assertEqual(self.page.locator('#study-result-score').is_visible(),correct!=20)
+        self.assertEqual(self.page.locator('#study-result-score').inner_text(),
+                         '' if correct==20 else f'{correct*5}てん！')
+        if correct==20:
+            image=reward.locator('img')
+            self.page.wait_for_function('''()=>{
+              const image=document.querySelector('#study-result-reward img');
+              return image?.complete && image.naturalWidth===1536 && image.naturalHeight===1024;
+            }''')
+            self.assertEqual(image.get_attribute('alt'),
+                             '100点満点！20問すべて正解です。猫とうさぎがお祝いしています。')
+            self.assertEqual(image.get_attribute('src'),'assets/rewards/kakezan_100ten_reward.webp')
+            self.assertEqual([line for line in self.page.locator('#study-finished').inner_text().splitlines() if line],
+                             ['🎉 テストの けっか','やったね！','もういちど テスト','ホームへ もどる'])
+            self.assertEqual(self.page.locator('#study-finished').get_by_role('img').count(),1)
+        else:
+            self.assertEqual(reward.locator('img').count(),0)
+
     def test_uniform_draw_ignores_history_and_weak_stays_weighted_ten(self):
         result=self.page.evaluate('''()=>{
           const saved=Math.random,ids=QUESTIONS.map(q=>q.id),first=[],draws=[];
@@ -72,7 +96,7 @@ class MultiplicationExamTest(unittest.TestCase):
 
     def test_scores_progress_persisted_results_and_fresh_retry(self):
         messages={
-            20:'100てん おめでとう！',
+            20:'やったね！',
             17:'すごい！ よくがんばったね！',
             19:'すごい！ よくがんばったね！',
             10:'さいごまで よくがんばったね！',
@@ -94,36 +118,23 @@ class MultiplicationExamTest(unittest.TestCase):
                     self.page.evaluate('nextStudy()')
                 perfect=correct==20
                 self.assertEqual(self.page.locator('#study-result-title').inner_text(),
-                                 '🎉 テストの けっか 🎉' if perfect else '🌸 テストの けっか')
-                self.assertEqual(self.page.locator('#study-result-score').inner_text(),f'{correct*5}てん！')
+                                 '🎉 テストの けっか' if perfect else '🌸 テストの けっか')
+                self.assert_exam_score(correct)
                 self.assertEqual(self.page.locator('#study-result-correct').inner_text(),
-                                 'ぜんぶ せいかい！' if perfect else f'{correct}もん せいかい！')
-                self.assertEqual(self.page.locator('#study-result-summary').inner_text(),
-                                 '20もん ぜんぶ せいかい' if perfect else '')
-                self.assertEqual(self.page.locator('#study-result-summary').is_visible(),perfect)
+                                 '' if perfect else f'{correct}もん せいかい！')
+                self.assertEqual(self.page.locator('#study-result-correct').is_visible(),not perfect)
+                self.assertEqual(self.page.locator('#study-result-summary').inner_text(),'')
+                self.assertTrue(self.page.locator('#study-result-summary').is_hidden())
                 if not perfect:
                     self.assertEqual(self.page.locator('#study-finished').inner_text().count(f'{correct}もん せいかい'),1)
                 self.assertEqual(self.page.locator('#study-result-remaining').inner_text(),message)
                 self.assertEqual(self.page.locator('#study-again').inner_text(),'もういちど テスト')
                 self.assertEqual(self.page.locator('#study-home').inner_text(),'ホームへ もどる')
                 self.assertTrue(self.page.locator('#study-last-result').is_hidden())
-                stars=self.page.locator('#study-result-stars')
-                self.assertEqual(stars.is_visible(),perfect)
+                self.assertEqual(self.page.locator('#study-result-stars').count(),0)
                 self.assertEqual(self.page.locator('#study-finished').evaluate(
                     'e=>getComputedStyle(e).borderTopColor'),
                     'rgb(223, 173, 76)' if perfect else 'rgb(237, 190, 208)')
-                if perfect:
-                    self.assertEqual(stars.get_attribute('aria-hidden'),'true')
-                    animation=stars.evaluate('''async e=>{
-                      const animations=e.getAnimations({subtree:true});
-                      const duration=animations.map(a=>a.effect.getComputedTiming().endTime);
-                      await Promise.all(animations.map(a=>a.finished));
-                      return {duration,finished:animations.every(a=>a.playState==='finished')};
-                    }''')
-                    self.assertEqual(len(animation['duration']),2)
-                    self.assertTrue(all(1000<=duration<=2000 for duration in animation['duration']))
-                    self.assertTrue(animation['finished'])
-                    self.page.emulate_media(reduced_motion='reduce')
                 # results array order need not equal question order; position is authoritative.
                 self.page.evaluate('()=>changeStudySet(currentSession.key,old=>({...old,results:[...old.results].reverse()}))')
                 before=self.page.evaluate('snapshotAllStores()')
@@ -133,22 +144,24 @@ class MultiplicationExamTest(unittest.TestCase):
                 self.assert_mistakes(results)
                 self.assertTrue(self.valid(before))
                 self.page.reload();self.ready()
-                self.assertEqual(self.page.locator('#study-result-score').inner_text(),f'{correct*5}てん！')
+                self.assert_exam_score(correct)
                 self.assert_mistakes(results)
                 self.page.locator('#study-home').click()
                 self.page.locator('#genre-dashboard').click()
                 self.page.locator('#study-finished').wait_for(state='visible')
-                self.assertEqual(self.page.locator('#study-result-score').inner_text(),f'{correct*5}てん！')
+                self.assert_exam_score(correct)
                 self.assert_mistakes(results)
                 self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
                 self.page.evaluate('data=>replaceAllStores(validateBackup({backupFormat:BACKUP_FORMAT,backupVersion:12,data}))',before)
                 self.page.reload();self.ready()
+                self.assert_exam_score(correct)
                 self.assert_mistakes(results)
                 self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
                 if perfect:
-                    self.assertTrue(stars.is_visible())
-                    self.assertEqual(stars.evaluate('e=>e.getAnimations({subtree:true}).length'),0)
-                    self.page.emulate_media(reduced_motion='no-preference')
+                    for motion in ['reduce','no-preference']:
+                        self.page.emulate_media(reduced_motion=motion)
+                        self.assertEqual(self.page.locator('#study-finished').evaluate(
+                            'e=>e.getAnimations({subtree:true}).length'),0)
                 self.page.locator('#study-again').click()
                 self.page.wait_for_function('quizReady && phase==="question"')
                 self.assertNotEqual(self.page.evaluate('currentSession.setId'),old_id)
@@ -164,7 +177,8 @@ class MultiplicationExamTest(unittest.TestCase):
         self.assertEqual(self.page.locator('#study-result-title').inner_text(),'苦手克服 セット結果')
         self.assertIn('回答数 10問 ｜ 正解数 10問',self.page.locator('#study-result-summary').inner_text())
         self.assertTrue(self.page.locator('#study-last-result').is_visible())
-        self.assertTrue(self.page.locator('#study-result-stars').is_hidden())
+        self.assertTrue(self.page.locator('#study-result-reward').is_hidden())
+        self.assertEqual(self.page.locator('#study-result-reward img').count(),0)
         self.assertTrue(self.page.locator('#study-result-score').is_hidden())
         self.assertTrue(self.page.locator('#study-mistakes').is_hidden())
         self.assertEqual(self.page.locator('#study-mistakes-list li').count(),0)
@@ -254,7 +268,8 @@ class MultiplicationExamTest(unittest.TestCase):
             self.page.evaluate('nextStudy()')
         self.assertIn('以前の10問セット',self.page.locator('#study-result-title').inner_text())
         self.assertTrue(self.page.locator('#study-result-score').is_hidden())
-        self.assertTrue(self.page.locator('#study-result-stars').is_hidden())
+        self.assertTrue(self.page.locator('#study-result-reward').is_hidden())
+        self.assertEqual(self.page.locator('#study-result-reward img').count(),0)
         self.assertTrue(self.page.locator('#study-last-result').is_visible())
         self.assertIn('回答数 10問',self.page.locator('#study-result-summary').inner_text())
         self.assertTrue(self.page.locator('#study-result-summary').is_visible())
@@ -306,6 +321,76 @@ class MultiplicationExamTest(unittest.TestCase):
         self.assertEqual(items.locator('strong').count(),17)
         self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
 
+    def test_approved_reward_loading_space_accessibility_and_failure(self):
+        import hashlib
+        from pathlib import Path
+        asset=Path(__file__).resolve().parents[1]/'assets/rewards/kakezan_100ten_reward.webp'
+        self.assertEqual(hashlib.sha256(asset.read_bytes()).hexdigest(),
+                         '3d4f0f8db1687510a668bdc8fce007dee215d195c84a5f409876168ff7236375')
+        pending=[]
+        self.page.route('**/assets/rewards/kakezan_100ten_reward.webp',lambda route:pending.append(route))
+        self.start()
+        for _ in range(20):self.grade();self.page.evaluate('nextStudy()')
+        self.page.wait_for_function('!!document.querySelector("#study-result-reward img")')
+        self.assertEqual(len(pending),1)
+        image=self.page.locator('#study-result-reward img')
+        before_box=image.bounding_box()
+        button_box=self.page.locator('#study-again').bounding_box()
+        self.assertGreater(before_box['width'],0)
+        self.assertAlmostEqual(before_box['width']/before_box['height'],1.5,places=2)
+        stored=self.page.evaluate('snapshotAllStores()')
+        self.assertEqual(len(stored),17)
+        pending.pop().fulfill(path=str(asset),content_type='image/webp')
+        self.assert_exam_score(20)
+        self.assertEqual(image.bounding_box(),before_box)
+        self.assertEqual(self.page.locator('#study-again').bounding_box(),button_box)
+        snapshot=self.page.locator('#study-finished').aria_snapshot()
+        self.assertEqual(snapshot.count('100点満点！20問すべて正解です。'),1)
+        self.assertNotIn('ぜんぶ せいかい',snapshot)
+        self.page.unroute('**/assets/rewards/kakezan_100ten_reward.webp')
+        self.page.route('**/assets/rewards/kakezan_100ten_reward.webp',
+                        lambda route:route.fulfill(status=404,body='missing',content_type='text/plain'))
+        self.page.reload();self.ready()
+        fallback=self.page.locator('.test-reward-fallback')
+        fallback.wait_for(state='visible')
+        self.assertEqual(fallback.inner_text(),'100てん！')
+        self.assertEqual(self.page.locator('#study-result-reward img').count(),0)
+        self.assertTrue(self.page.locator('#study-result-score').is_hidden())
+        self.assertEqual(self.page.locator('#study-finished').get_by_role('img').count(),1)
+        self.assertEqual(fallback.get_attribute('aria-label'),'100点満点！20問すべて正解です。')
+        snapshot=self.page.locator('#study-finished').aria_snapshot()
+        self.assertEqual(snapshot.count('100点満点！20問すべて正解です。'),1)
+        self.assertNotIn('猫とうさぎ',snapshot)
+        for w,h in [(320,568),(844,390),(507,768)]:
+            self.page.set_viewport_size({'width':w,'height':h})
+            fallback.scroll_into_view_if_needed()
+            self.assertAlmostEqual(fallback.bounding_box()['width']/fallback.bounding_box()['height'],1.5,places=2)
+            self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),w)
+            for selector in ['#study-again','#study-home']:
+                button=self.page.locator(selector);button.scroll_into_view_if_needed()
+                self.assertTrue(button.is_enabled())
+                box=button.bounding_box()
+                self.assertGreaterEqual(box['y'],0)
+                self.assertLessEqual(box['y']+box['height'],h+1)
+        self.assertEqual(self.page.evaluate('snapshotAllStores()'),stored)
+        self.page.locator('#study-home').click()
+        self.page.locator('#genre-dashboard').click()
+        fallback.wait_for(state='visible')
+        self.assertEqual(self.page.evaluate('snapshotAllStores()'),stored)
+        # A later successful load removes the fallback; profile changes use their own results.
+        self.page.unroute('**/assets/rewards/kakezan_100ten_reward.webp')
+        self.page.reload();self.ready();self.assert_exam_score(20)
+        self.assertEqual(fallback.count(),0)
+        self.page.evaluate('beginTestMode()')
+        self.start()
+        for _ in range(20):self.grade();self.page.evaluate('nextStudy()')
+        self.assert_exam_score(20)
+        both=self.page.evaluate('snapshotAllStores()')
+        self.page.evaluate('returnToStudentHome()')
+        self.page.locator('#genre-dashboard').click()
+        self.assert_exam_score(20)
+        self.assertEqual(self.page.evaluate('snapshotAllStores()'),both)
+
     def test_mobile_layout_and_optional_screenshots(self):
         import json
         import os
@@ -313,7 +398,7 @@ class MultiplicationExamTest(unittest.TestCase):
         evidence=os.environ.get('KAKEZAN_EXAM_EVIDENCE')
         folder=Path(evidence) if evidence else None
         if folder:folder.mkdir(parents=True,exist_ok=True)
-        dimensions=[(390,844),(844,390),(768,1024),(1024,768),(320,568),(375,667),(507,768),(820,1180)]
+        dimensions=[(390,844),(844,390),(768,1024),(1024,768),(320,568),(375,667),(507,768),(820,1180),(1180,820),(667,320)]
         metrics=[]
         self.page.emulate_media(reduced_motion='reduce')
         for correct in [17,0,20]:
@@ -326,7 +411,10 @@ class MultiplicationExamTest(unittest.TestCase):
                     self.page.evaluate('n=>document.documentElement.style.fontSize=n+"%"',percent)
                     for screen in screens:
                         if screen=='home':self.page.evaluate('navigateHome()')
-                        elif self.page.locator('#home').is_visible():self.page.locator('#genre-dashboard').click()
+                        elif self.page.locator('#home').is_visible():
+                            # Keyboard navigation also works when a tall sticky header covers the card's center.
+                            self.page.locator('#genre-dashboard').focus()
+                            self.page.locator('#genre-dashboard').press('Enter')
                         selector='#genre-dashboard' if screen=='home' else '#study-finished'
                         self.page.locator(selector).wait_for(state='visible')
                         self.page.evaluate('window.scrollTo(0,0)')
@@ -334,12 +422,13 @@ class MultiplicationExamTest(unittest.TestCase):
                           const r=e.getBoundingClientRect();
                           const children=[...e.querySelectorAll('*')].filter(x=>x.getClientRects().length);
                           const score=document.querySelector('#study-result-score');
+                          const hero=document.querySelector(e.classList.contains('test-result-perfect')?'#study-result-reward':'#study-result-score');
                           return {elementWidth:r.width,scrollWidth:document.documentElement.scrollWidth,
                             viewport:innerWidth,overflow:children.filter(x=>{
                               const c=x.getBoundingClientRect();return c.left<r.left||c.right>r.right+1||x.scrollWidth>x.clientWidth+1;
                             }).map(x=>x.id||x.className),
                             scoreFont:parseFloat(getComputedStyle(score).fontSize),
-                            resultControls:[score,...e.querySelectorAll('#study-again,#study-home')].map(x=>{
+                            resultControls:[hero,...e.querySelectorAll('#study-again,#study-home')].map(x=>{
                               const box=x.getBoundingClientRect();return {top:box.top,bottom:box.bottom,height:box.height};
                             })};
                         }''')
@@ -350,9 +439,16 @@ class MultiplicationExamTest(unittest.TestCase):
                             self.assertGreaterEqual(measured['scoreFont'],48)
                             for control in measured['resultControls']:
                                 self.assertGreaterEqual(control['height'],44)
-                                if correct==20 and percent==100 and (width,height) in dimensions[:4]:
-                                    self.assertGreaterEqual(control['top'],0)
-                                    self.assertLessEqual(control['bottom'],height,(width,height,screen,measured))
+                            if correct==20:
+                                hero=self.page.locator('#study-result-reward img')
+                                self.page.wait_for_function('document.querySelector("#study-result-reward img").naturalWidth===1536')
+                                box=hero.bounding_box()
+                                self.assertAlmostEqual(box['width']/box['height'],1.5,places=2)
+                                self.assertLessEqual(box['width'],576)
+                                self.assertEqual(hero.evaluate('e=>getComputedStyle(e).objectFit'),'contain')
+                                hero.scroll_into_view_if_needed()
+                                self.assertGreaterEqual(hero.bounding_box()['y'],0)
+                                self.assertLessEqual(hero.bounding_box()['y']+hero.bounding_box()['height'],height+1)
                         if screen!='home':
                             self.assertEqual(self.page.locator('#study-mistakes-list li').count(),20-correct)
                             for item in self.page.locator('#study-mistakes-list li').all():
