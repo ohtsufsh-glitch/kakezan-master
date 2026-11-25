@@ -54,7 +54,13 @@ class MultiplicationExamTest(unittest.TestCase):
         self.assertNotEqual(result['shuffled'],result['ids'][:20])
 
     def test_scores_progress_persisted_results_and_fresh_retry(self):
-        for correct in [0,10,17,20]:
+        messages={
+            20:'100てん おめでとう！',
+            17:'すごい！ よくがんばったね！',
+            10:'さいごまで よくがんばったね！',
+            0:'20もんに ちょうせんできたね！\nまた やってみよう！',
+        }
+        for correct,message in messages.items():
             with self.subTest(correct=correct):
                 self.page.evaluate('startStudy("mix",null,true)')
                 self.page.wait_for_function('quizReady && phase==="question"')
@@ -63,10 +69,38 @@ class MultiplicationExamTest(unittest.TestCase):
                     self.assertIn(f'{i+1} / 20もん',self.page.locator('#study-progress').inner_text())
                     self.grade(i<correct)
                     self.assertEqual(self.page.evaluate('currentSession.position'),i)
+                    self.assertTrue(self.page.locator('#quiz #result').is_visible())
                     if i==19:self.assertEqual(self.page.locator('#next').inner_text(),'けっかをみる！')
                     self.page.evaluate('nextStudy()')
+                perfect=correct==20
+                self.assertEqual(self.page.locator('#study-result-title').inner_text(),
+                                 '🎉 テストの けっか 🎉' if perfect else '🌸 テストの けっか')
                 self.assertEqual(self.page.locator('#study-result-score').inner_text(),f'{correct*5}てん！')
-                self.assertEqual(self.page.locator('#study-result-summary').inner_text(),f'20もんちゅう {correct}もん せいかい')
+                self.assertEqual(self.page.locator('#study-result-correct').inner_text(),
+                                 'ぜんぶ せいかい！' if perfect else f'{correct}もん せいかい！')
+                self.assertEqual(self.page.locator('#study-result-summary').inner_text(),
+                                 '20もん ぜんぶ せいかい' if perfect else f'20もんちゅう {correct}もん せいかい')
+                self.assertEqual(self.page.locator('#study-result-remaining').inner_text(),message)
+                self.assertEqual(self.page.locator('#study-again').inner_text(),'もういちど テスト')
+                self.assertEqual(self.page.locator('#study-home').inner_text(),'ホームへ もどる')
+                self.assertTrue(self.page.locator('#study-last-result').is_hidden())
+                stars=self.page.locator('#study-result-stars')
+                self.assertEqual(stars.is_visible(),perfect)
+                self.assertEqual(self.page.locator('#study-finished').evaluate(
+                    'e=>getComputedStyle(e).borderTopColor'),
+                    'rgb(223, 173, 76)' if perfect else 'rgb(237, 190, 208)')
+                if perfect:
+                    self.assertEqual(stars.get_attribute('aria-hidden'),'true')
+                    animation=stars.evaluate('''async e=>{
+                      const animations=e.getAnimations({subtree:true});
+                      const duration=animations.map(a=>a.effect.getComputedTiming().endTime);
+                      await Promise.all(animations.map(a=>a.finished));
+                      return {duration,finished:animations.every(a=>a.playState==='finished')};
+                    }''')
+                    self.assertEqual(len(animation['duration']),2)
+                    self.assertTrue(all(1000<=duration<=2000 for duration in animation['duration']))
+                    self.assertTrue(animation['finished'])
+                    self.page.emulate_media(reduced_motion='reduce')
                 before=self.page.evaluate('snapshotAllStores()')
                 self.assertTrue(self.valid(before))
                 self.page.reload();self.ready()
@@ -75,20 +109,49 @@ class MultiplicationExamTest(unittest.TestCase):
                 self.page.locator('#genre-dashboard').click()
                 self.assertEqual(self.page.locator('#study-result-score').inner_text(),f'{correct*5}てん！')
                 self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
+                if perfect:
+                    self.assertTrue(stars.is_visible())
+                    self.assertEqual(stars.evaluate('e=>e.getAnimations({subtree:true}).length'),0)
+                    self.page.emulate_media(reduced_motion='no-preference')
                 self.page.locator('#study-again').click()
                 self.page.wait_for_function('quizReady && phase==="question"')
                 self.assertNotEqual(self.page.evaluate('currentSession.setId'),old_id)
                 self.assertEqual(self.page.evaluate('currentSession.results'),[])
 
+        self.page.evaluate('navigateHome()')
+        self.page.evaluate('startStudy("weak")')
+        entries=self.page.evaluate('currentSession.entries.length')
+        self.assertEqual(entries,10)
+        for _ in range(entries):
+            self.grade()
+            self.page.evaluate('nextStudy()')
+        self.assertEqual(self.page.locator('#study-result-title').inner_text(),'苦手克服 セット結果')
+        self.assertIn('回答数 10問 ｜ 正解数 10問',self.page.locator('#study-result-summary').inner_text())
+        self.assertTrue(self.page.locator('#study-last-result').is_visible())
+        self.assertTrue(self.page.locator('#study-result-stars').is_hidden())
+        self.assertTrue(self.page.locator('#study-result-score').is_hidden())
+
     def test_whole_card_keyboard_and_touch(self):
         card=self.page.locator('#genre-dashboard')
         self.assertEqual(card.evaluate('(e)=>e.tagName'),'BUTTON')
         self.assertEqual(card.locator('button,a,input,[tabindex]').count(),0)
-        self.assertIn('20問、100点満点',card.get_attribute('aria-label'))
-        for selector in ['.test-card-title','.test-card-intro','.test-card-full','#test-card-action','#test-card-note']:
+        self.assertEqual(card.get_attribute('aria-label'),'かけざんテスト、20問、100点満点、テストを はじめる！')
+        copy_by_selector={
+            '.test-card-title':'📝 かけざんテスト',
+            '.test-card-intro':'20もん といて、なんてん とれるかな？',
+            '.test-card-full':'⭐ 100てん まんてん ⭐',
+            '#test-card-action':'テストを はじめる！',
+        }
+        for selector,copy_text in copy_by_selector.items():
+            self.assertEqual(card.locator(selector).inner_text(),copy_text)
+        self.assertNotIn('81もんから ランダムに しゅつだい',card.inner_text())
+        self.assertTrue(card.locator('#test-card-note').is_hidden())
+        for selector in copy_by_selector:
             self.page.locator(selector).click()
             self.page.wait_for_function('quizReady && phase==="question"')
             self.page.evaluate('navigateHome()')
+            self.assertEqual(card.locator('#test-card-action').inner_text(),'テストを つづける！')
+            self.assertEqual(card.get_attribute('aria-label'),'かけざんテスト、20問、100点満点、テストを つづける！')
         for key in ['Enter','Space']:
             card.focus();card.press(key)
             self.page.wait_for_function('quizReady && phase==="question"')
@@ -144,12 +207,17 @@ class MultiplicationExamTest(unittest.TestCase):
         self.page.evaluate('navigateHome()')
         self.assertIn('以前の10問セット',self.page.locator('#genre-dashboard').inner_text())
         self.assertNotIn('100てん',self.page.locator('#genre-dashboard').inner_text())
+        self.assertEqual(self.page.locator('.test-card-intro').inner_text(),'前のつづきから はじめよう！')
+        self.assertEqual(self.page.locator('#test-card-action').inner_text(),'以前の10問セットを再開')
+        self.assertTrue(self.page.locator('#test-card-note').is_visible())
         self.page.locator('#genre-dashboard').click()
         for i in range(10):
             if i:self.grade()
             self.page.evaluate('nextStudy()')
         self.assertIn('以前の10問セット',self.page.locator('#study-result-title').inner_text())
         self.assertTrue(self.page.locator('#study-result-score').is_hidden())
+        self.assertTrue(self.page.locator('#study-result-stars').is_hidden())
+        self.assertTrue(self.page.locator('#study-last-result').is_visible())
         self.assertIn('回答数 10問',self.page.locator('#study-result-summary').inner_text())
         finished=self.page.evaluate("snapshotAllStores()")
         self.page.locator('#study-again').click()
@@ -184,42 +252,55 @@ class MultiplicationExamTest(unittest.TestCase):
         evidence=os.environ.get('KAKEZAN_EXAM_EVIDENCE')
         folder=Path(evidence) if evidence else None
         if folder:folder.mkdir(parents=True,exist_ok=True)
-        self.start()
-        for i in range(20):self.grade(i<17);self.page.evaluate('nextStudy()')
         dimensions=[(390,844),(844,390),(768,1024),(1024,768),(320,568),(375,667),(507,768),(820,1180)]
         metrics=[]
-        for width,height in dimensions:
-            for percent in [100,200]:
-                self.page.set_viewport_size({'width':width,'height':height})
-                self.page.evaluate('n=>document.documentElement.style.fontSize=n+"%"',percent)
-                for screen in ['home','result']:
-                    if screen=='home':self.page.evaluate('navigateHome()')
-                    else:self.page.locator('#genre-dashboard').click()
-                    selector='#genre-dashboard' if screen=='home' else '#study-finished'
-                    self.page.locator(selector).wait_for(state='visible')
-                    measured=self.page.locator(selector).evaluate('''e=>{
-                      const r=e.getBoundingClientRect();
-                      const children=[...e.querySelectorAll('*')].filter(x=>x.getClientRects().length);
-                      return {elementWidth:r.width,scrollWidth:document.documentElement.scrollWidth,
-                        viewport:innerWidth,overflow:children.filter(x=>{
-                          const c=x.getBoundingClientRect();return c.left<r.left||c.right>r.right+1||x.scrollWidth>x.clientWidth+1;
-                        }).map(x=>x.id||x.className),
-                        scoreFont:parseFloat(getComputedStyle(document.querySelector('#study-result-score')).fontSize)};
-                    }''')
-                    self.assertLessEqual(measured['scrollWidth'],width)
-                    self.assertEqual(measured['overflow'],[],(width,height,percent,screen,measured))
-                    metrics.append(dict(width=width,height=height,percent=percent,screen=screen,**measured))
-                    if screen=='result':self.assertGreaterEqual(measured['scoreFont'],48)
-                    if folder and percent==100 and (width,height) in dimensions[:4]:
-                        if screen=='home':
-                            capture_context=self.browser.new_context(viewport={'width':width,'height':height})
-                            try:
-                                capture=capture_context.new_page();capture.goto(self.url);capture.wait_for_function('appReady')
-                                bottom=capture.locator('#dashboard').evaluate('e=>e.getBoundingClientRect().bottom')
-                                capture.screenshot(path=str(folder/f'{screen}-{width}x{height}.png'),full_page=True,
-                                                   clip={'x':0,'y':0,'width':width,'height':bottom+16})
-                            finally:capture_context.close()
-                        else:
-                            self.page.evaluate('window.scrollTo(0,0)')
-                            self.page.screenshot(path=str(folder/f'{screen}-{width}x{height}.png'),full_page=True)
+        self.page.emulate_media(reduced_motion='reduce')
+        for correct in [17,20]:
+            self.page.evaluate('startStudy("mix",null,true)')
+            for i in range(20):self.grade(i<correct);self.page.evaluate('nextStudy()')
+            screens=['home',f'result-{correct*5}'] if correct==17 else [f'result-{correct*5}']
+            for width,height in dimensions:
+                for percent in [100,200]:
+                    self.page.set_viewport_size({'width':width,'height':height})
+                    self.page.evaluate('n=>document.documentElement.style.fontSize=n+"%"',percent)
+                    for screen in screens:
+                        if screen=='home':self.page.evaluate('navigateHome()')
+                        elif self.page.locator('#home').is_visible():self.page.locator('#genre-dashboard').click()
+                        selector='#genre-dashboard' if screen=='home' else '#study-finished'
+                        self.page.locator(selector).wait_for(state='visible')
+                        self.page.evaluate('window.scrollTo(0,0)')
+                        measured=self.page.locator(selector).evaluate('''e=>{
+                          const r=e.getBoundingClientRect();
+                          const children=[...e.querySelectorAll('*')].filter(x=>x.getClientRects().length);
+                          const score=document.querySelector('#study-result-score');
+                          return {elementWidth:r.width,scrollWidth:document.documentElement.scrollWidth,
+                            viewport:innerWidth,overflow:children.filter(x=>{
+                              const c=x.getBoundingClientRect();return c.left<r.left||c.right>r.right+1||x.scrollWidth>x.clientWidth+1;
+                            }).map(x=>x.id||x.className),
+                            scoreFont:parseFloat(getComputedStyle(score).fontSize),
+                            resultControls:[score,...e.querySelectorAll('#study-again,#study-home')].map(x=>{
+                              const box=x.getBoundingClientRect();return {top:box.top,bottom:box.bottom,height:box.height};
+                            })};
+                        }''')
+                        self.assertLessEqual(measured['scrollWidth'],width)
+                        self.assertEqual(measured['overflow'],[],(width,height,percent,screen,measured))
+                        metrics.append(dict(width=width,height=height,percent=percent,screen=screen,**measured))
+                        if screen!='home':
+                            self.assertGreaterEqual(measured['scoreFont'],48)
+                            for control in measured['resultControls']:
+                                self.assertGreaterEqual(control['height'],44)
+                                if percent==100 and (width,height) in dimensions[:4]:
+                                    self.assertGreaterEqual(control['top'],0)
+                                    self.assertLessEqual(control['bottom'],height,(width,height,screen,measured))
+                        if folder and percent==100 and (width,height) in dimensions[:4]:
+                            if screen=='home':
+                                capture_context=self.browser.new_context(viewport={'width':width,'height':height})
+                                try:
+                                    capture=capture_context.new_page();capture.goto(self.url);capture.wait_for_function('appReady')
+                                    bottom=capture.locator('#dashboard').evaluate('e=>e.getBoundingClientRect().bottom')
+                                    capture.screenshot(path=str(folder/f'{screen}-{width}x{height}.png'),full_page=True,
+                                                       clip={'x':0,'y':0,'width':width,'height':bottom+16})
+                                finally:capture_context.close()
+                            else:
+                                self.page.screenshot(path=str(folder/f'{screen}-{width}x{height}.png'),full_page=True)
         if folder:(folder/'metrics.json').write_text(json.dumps(metrics,ensure_ascii=False,indent=2)+'\n')
