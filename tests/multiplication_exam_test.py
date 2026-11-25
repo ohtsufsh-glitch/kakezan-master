@@ -28,6 +28,23 @@ class MultiplicationExamTest(unittest.TestCase):
           catch {return false;}
         }''', [data,version])
 
+    def assert_mistakes(self, results):
+        wrong=sorted((r for r in results if not r['correct']),key=lambda r:r['position'])
+        self.assertEqual(self.page.locator('#study-mistakes').is_visible(),bool(wrong))
+        items=self.page.locator('#study-mistakes-list li')
+        self.assertEqual(items.count(),len(wrong))
+        for i,result in enumerate(wrong):
+            _,table,right=result['questionId'].split(':')
+            left,right=int(table[1:]),int(right)
+            answer=left*right
+            self.assertEqual(items.nth(i).inner_text(),f'{left} × {right} = {answer}')
+            self.assertEqual(items.nth(i).locator('strong').inner_text(),str(answer))
+            self.assertEqual(items.nth(i).get_by_role('img').get_attribute('aria-label'),
+                             f'{left} かける {right}、ただしい こたえは {answer}')
+        if wrong:
+            self.assertEqual(self.page.locator('#study-mistakes-title').inner_text(),
+                             'まちがえた もんだいを かくにんしよう！')
+
     def test_uniform_draw_ignores_history_and_weak_stays_weighted_ten(self):
         result=self.page.evaluate('''()=>{
           const saved=Math.random,ids=QUESTIONS.map(q=>q.id),first=[],draws=[];
@@ -57,6 +74,7 @@ class MultiplicationExamTest(unittest.TestCase):
         messages={
             20:'100てん おめでとう！',
             17:'すごい！ よくがんばったね！',
+            19:'すごい！ よくがんばったね！',
             10:'さいごまで よくがんばったね！',
             0:'20もんに ちょうせんできたね！\nまた やってみよう！',
         }
@@ -67,7 +85,9 @@ class MultiplicationExamTest(unittest.TestCase):
                 old_id=self.page.evaluate('currentSession.setId')
                 for i in range(20):
                     self.assertIn(f'{i+1} / 20もん',self.page.locator('#study-progress').inner_text())
-                    self.grade(i<correct)
+                    # Include wrong answers at the start, middle and final position.
+                    wrong={0,8,19} if correct==17 else {9} if correct==19 else set(range(correct,20))
+                    self.grade(i not in wrong)
                     self.assertEqual(self.page.evaluate('currentSession.position'),i)
                     self.assertTrue(self.page.locator('#quiz #result').is_visible())
                     if i==19:self.assertEqual(self.page.locator('#next').inner_text(),'けっかをみる！')
@@ -79,7 +99,10 @@ class MultiplicationExamTest(unittest.TestCase):
                 self.assertEqual(self.page.locator('#study-result-correct').inner_text(),
                                  'ぜんぶ せいかい！' if perfect else f'{correct}もん せいかい！')
                 self.assertEqual(self.page.locator('#study-result-summary').inner_text(),
-                                 '20もん ぜんぶ せいかい' if perfect else f'20もんちゅう {correct}もん せいかい')
+                                 '20もん ぜんぶ せいかい' if perfect else '')
+                self.assertEqual(self.page.locator('#study-result-summary').is_visible(),perfect)
+                if not perfect:
+                    self.assertEqual(self.page.locator('#study-finished').inner_text().count(f'{correct}もん せいかい'),1)
                 self.assertEqual(self.page.locator('#study-result-remaining').inner_text(),message)
                 self.assertEqual(self.page.locator('#study-again').inner_text(),'もういちど テスト')
                 self.assertEqual(self.page.locator('#study-home').inner_text(),'ホームへ もどる')
@@ -101,13 +124,26 @@ class MultiplicationExamTest(unittest.TestCase):
                     self.assertTrue(all(1000<=duration<=2000 for duration in animation['duration']))
                     self.assertTrue(animation['finished'])
                     self.page.emulate_media(reduced_motion='reduce')
+                # results array order need not equal question order; position is authoritative.
+                self.page.evaluate('()=>changeStudySet(currentSession.key,old=>({...old,results:[...old.results].reverse()}))')
                 before=self.page.evaluate('snapshotAllStores()')
+                self.assertEqual(len(before),17)
+                results=next(s['results'] for s in before['studySets'] if s['setId']==old_id)
+                self.assertEqual(sum(not r['correct'] for r in results),20-correct)
+                self.assert_mistakes(results)
                 self.assertTrue(self.valid(before))
                 self.page.reload();self.ready()
                 self.assertEqual(self.page.locator('#study-result-score').inner_text(),f'{correct*5}てん！')
+                self.assert_mistakes(results)
                 self.page.locator('#study-home').click()
                 self.page.locator('#genre-dashboard').click()
+                self.page.locator('#study-finished').wait_for(state='visible')
                 self.assertEqual(self.page.locator('#study-result-score').inner_text(),f'{correct*5}てん！')
+                self.assert_mistakes(results)
+                self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
+                self.page.evaluate('data=>replaceAllStores(validateBackup({backupFormat:BACKUP_FORMAT,backupVersion:12,data}))',before)
+                self.page.reload();self.ready()
+                self.assert_mistakes(results)
                 self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
                 if perfect:
                     self.assertTrue(stars.is_visible())
@@ -130,6 +166,8 @@ class MultiplicationExamTest(unittest.TestCase):
         self.assertTrue(self.page.locator('#study-last-result').is_visible())
         self.assertTrue(self.page.locator('#study-result-stars').is_hidden())
         self.assertTrue(self.page.locator('#study-result-score').is_hidden())
+        self.assertTrue(self.page.locator('#study-mistakes').is_hidden())
+        self.assertEqual(self.page.locator('#study-mistakes-list li').count(),0)
 
     def test_whole_card_keyboard_and_touch(self):
         card=self.page.locator('#genre-dashboard')
@@ -219,6 +257,9 @@ class MultiplicationExamTest(unittest.TestCase):
         self.assertTrue(self.page.locator('#study-result-stars').is_hidden())
         self.assertTrue(self.page.locator('#study-last-result').is_visible())
         self.assertIn('回答数 10問',self.page.locator('#study-result-summary').inner_text())
+        self.assertTrue(self.page.locator('#study-result-summary').is_visible())
+        self.assertTrue(self.page.locator('#study-mistakes').is_hidden())
+        self.assertEqual(self.page.locator('#study-mistakes-list li').count(),0)
         finished=self.page.evaluate("snapshotAllStores()")
         self.page.locator('#study-again').click()
         self.page.wait_for_function('quizReady && phase==="question"')
@@ -245,6 +286,26 @@ class MultiplicationExamTest(unittest.TestCase):
             else:s['results'][0]['correct']=False
             self.assertFalse(self.valid(bad))
 
+    def test_missing_question_and_revision_do_not_guess_answers(self):
+        self.start()
+        for _ in range(20):self.grade(False);self.page.evaluate('nextStudy()')
+        # Deliberately damaged local records, not an accepted backup shape.
+        self.page.evaluate('''()=>changeStudySet(currentSession.key,old=>{
+          old.results[0].questionId='MULT:T99:99';old.entries[0].questionId='MULT:T99:99';
+          old.results[1].revision=2;old.entries[1].revision=2;
+          old.results[2].questionId=old.entries[3].questionId;
+          return old;
+        })''')
+        before=self.page.evaluate('snapshotAllStores()')
+        self.page.evaluate('restoreStudy("mix",null)')
+        items=self.page.locator('#study-mistakes-list li')
+        self.assertEqual(items.count(),20)
+        for i in range(3):
+            self.assertEqual(items.nth(i).inner_text(),'この もんだいは ひょうじできません。')
+            self.assertEqual(items.nth(i).locator('strong,[role="img"]').count(),0)
+        self.assertEqual(items.locator('strong').count(),17)
+        self.assertEqual(self.page.evaluate('snapshotAllStores()'),before)
+
     def test_mobile_layout_and_optional_screenshots(self):
         import json
         import os
@@ -255,7 +316,7 @@ class MultiplicationExamTest(unittest.TestCase):
         dimensions=[(390,844),(844,390),(768,1024),(1024,768),(320,568),(375,667),(507,768),(820,1180)]
         metrics=[]
         self.page.emulate_media(reduced_motion='reduce')
-        for correct in [17,20]:
+        for correct in [17,0,20]:
             self.page.evaluate('startStudy("mix",null,true)')
             for i in range(20):self.grade(i<correct);self.page.evaluate('nextStudy()')
             screens=['home',f'result-{correct*5}'] if correct==17 else [f'result-{correct*5}']
@@ -289,9 +350,26 @@ class MultiplicationExamTest(unittest.TestCase):
                             self.assertGreaterEqual(measured['scoreFont'],48)
                             for control in measured['resultControls']:
                                 self.assertGreaterEqual(control['height'],44)
-                                if percent==100 and (width,height) in dimensions[:4]:
+                                if correct==20 and percent==100 and (width,height) in dimensions[:4]:
                                     self.assertGreaterEqual(control['top'],0)
                                     self.assertLessEqual(control['bottom'],height,(width,height,screen,measured))
+                        if screen!='home':
+                            self.assertEqual(self.page.locator('#study-mistakes-list li').count(),20-correct)
+                            for item in self.page.locator('#study-mistakes-list li').all():
+                                item.scroll_into_view_if_needed()
+                                box=item.bounding_box()
+                                self.assertGreaterEqual(box['y'],0)
+                                self.assertLessEqual(box['y']+box['height'],height+1)
+                            for button in ['#study-again','#study-home']:
+                                control=self.page.locator(button)
+                                control.scroll_into_view_if_needed()
+                                box=control.bounding_box()
+                                self.assertTrue(control.is_enabled())
+                                self.assertGreaterEqual(box['y'],0)
+                                self.assertLessEqual(box['y']+box['height'],height+1)
+                                control.focus()
+                                self.assertTrue(control.evaluate('e=>document.activeElement===e'))
+                            self.page.evaluate('window.scrollTo(0,0)')
                         if folder and percent==100 and (width,height) in dimensions[:4]:
                             if screen=='home':
                                 capture_context=self.browser.new_context(viewport={'width':width,'height':height})
