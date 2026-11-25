@@ -420,6 +420,14 @@
     #study-result-correct { margin:0; font-size:1.3rem; font-weight:800; }
     .test-result #study-result-summary { margin:2px 0 0; color:#664951; font-size:.9rem; }
     .test-result #study-result-remaining { margin:12px 0 0; font-weight:700; white-space:pre-line; }
+    #study-mistakes { margin-top:24px; text-align:left; }
+    #study-mistakes-title { font-size:1.15rem; line-height:1.6; color:#78364f; word-break:keep-all; text-wrap:balance; }
+    #study-mistakes-list { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; padding:0; list-style:none; }
+    #study-mistakes-list li { padding:14px 10px; border:1px solid #edbed0; border-radius:14px; background:#fffafb; text-align:center; font-size:1.5rem; line-height:1.6; }
+    #study-mistakes-list strong { color:#a52b60; font-weight:900; }
+    @media (min-width:768px) {
+      #study-mistakes-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
     .test-result #study-again { min-height:44px; margin:16px 0 8px; background:#a52b60; }
     .test-result #study-home { border-color:#d59bb2; color:#78364f; }
     @media (orientation:landscape) and (max-height:500px) {
@@ -1074,6 +1082,10 @@
     <p id="study-result-correct" class="hidden"></p>
     <p id="study-result-summary"></p>
     <p id="study-result-remaining"></p>
+    <section id="study-mistakes" class="hidden" aria-labelledby="study-mistakes-title">
+      <h3 id="study-mistakes-title">まちがえた もんだいを かくにんしよう！</h3>
+      <ul id="study-mistakes-list" role="list"></ul>
+    </section>
     <div id="study-last-result" class="result hidden" aria-live="polite"></div>
     <button id="study-report-question" class="feedback-link hidden" type="button">⚑ この問題について報告する</button>
     <button id="study-again" class="primary" type="button">もう1セット挑戦</button>
@@ -1231,7 +1243,7 @@
 <script>
 "use strict";
 // かけざんマスター：画面に表示するアプリ版はこの定数で管理。
-const APP_VERSION = "v0.4.7";
+const APP_VERSION = "v0.4.8";
 // v0.1.0の履歴・コイン・バックアップの参照用。出題対象にはしない。
 const LEGACY_ERAS = [
   ["E01", "旧石器・縄文・弥生"],
@@ -4707,7 +4719,8 @@ async function restoreStudy(mode,genre,ctx=viewContext()) {
     $("study-result-score").textContent=test?`${correct*5}てん！`:"";
     $("study-result-correct").classList.toggle("hidden",!test);
     $("study-result-correct").textContent=test?(perfect?"ぜんぶ せいかい！":`${correct}もん せいかい！`):"";
-    $("study-result-summary").textContent=test?(perfect?"20もん ぜんぶ せいかい":`20もんちゅう ${correct}もん せいかい`):`回答数 ${count}問 ｜ 正解数 ${correct}問 ｜ 正答率 ${count?Math.round(correct/count*100):0}%`;
+    $("study-result-summary").classList.toggle("hidden",test&&!perfect);
+    $("study-result-summary").textContent=test?(perfect?"20もん ぜんぶ せいかい":""):`回答数 ${count}問 ｜ 正解数 ${correct}問 ｜ 正答率 ${count?Math.round(correct/count*100):0}%`;
     $("study-again").textContent=test?"もういちど テスト":mode==="mix"?"もういちどテスト":"もう1セット挑戦";
     $("study-home").textContent=test?"ホームへ もどる":mode==="mix"?"ホームへもどる":"学習ホームへ戻る";
     const remaining=studyCandidates(mode,genre,activeQuestions,activeProgressRecords).length;
@@ -4718,6 +4731,28 @@ async function restoreStudy(mode,genre,ctx=viewContext()) {
     else if(mode==="mix") message="以前の10問セットが おわったよ！ つぎは20もんの かけざんテストに ちょうせん！";
     else message=remaining?`現在残っている苦手問題：${remaining}問`:"🎉 苦手問題をすべて克服したよ！ 未挑戦の問題は段別・かけざんテストで学ぼう。";
     $("study-result-remaining").textContent=message;
+    $("study-mistakes").classList.toggle("hidden",!test||perfect);
+    $("study-mistakes-list").replaceChildren();
+    if(test&&!perfect) {
+      // 保存済みの正誤・出題位置を読むだけ。採点・報酬・保存は行わない。
+      for(const result of set.results.filter(r=>r.correct===false).sort((a,b)=>a.position-b.position)) {
+        const entry=set.entries[result.position];
+        const q=entry&&entry.questionId===result.questionId&&entry.revision===result.revision&&
+          activeQuestions.find(q=>q.id===result.questionId&&questionRevision(q)===result.revision);
+        const item=document.createElement("li");
+        if(q) {
+          const equation=document.createElement("span"),answer=document.createElement("strong");
+          equation.setAttribute("role","img");
+          equation.setAttribute("aria-label",`${q.left} かける ${q.right}、ただしい こたえは ${q.answer}`);
+          equation.append(`${q.left} × ${q.right} = `);
+          answer.textContent=String(q.answer);equation.append(answer);item.append(equation);
+        } else {
+          // IDやrevisionが一致しないときは式・正答を推測しない。
+          item.textContent="この もんだいは ひょうじできません。";
+        }
+        $("study-mistakes-list").append(item);
+      }
+    }
     $("study-again").disabled=!remaining;
     const last=set.results.find(r=>r.position===set.entries.length-1);
     const q=last&&activeQuestions.find(q=>q.id===last.questionId&&questionRevision(q)===last.revision);

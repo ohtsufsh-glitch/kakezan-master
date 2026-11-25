@@ -38,7 +38,7 @@ class AppIsolationTest(unittest.TestCase):
           IDBFactory.prototype.open=function(name,...args){window.openedDatabases.push(name);return originalOpen.call(this,name,...args);};''')
         self.page.reload();self.page.wait_for_function('appReady')
         self.assertEqual(self.page.evaluate('openedDatabases'), ['kakezan-master-v1'])
-        self.assertEqual(self.page.evaluate('[DB_VERSION,BACKUP_VERSION,APP_VERSION,db.objectStoreNames.length]'),[12,12,'v0.4.7',17])
+        self.assertEqual(self.page.evaluate('[DB_VERSION,BACKUP_VERSION,APP_VERSION,db.objectStoreNames.length]'),[12,12,'v0.4.8',17])
         self.assertTrue(self.page.evaluate("async()=>Object.entries(await snapshotAllStores()).every(([k,v])=>['coinMeta','arcadeBoards'].includes(k)||v.length===0)"))
         self.page.evaluate(plush.FIXTURE_HELPERS)
         self.page.evaluate("async()=>plushInstall(plushFixture(['shiba'],'student'))")
