@@ -72,7 +72,8 @@ class MultiplicationTest(unittest.TestCase):
             self.assertTrue(self.page.evaluate('async()=>{const d=await snapshotAllStores();return !!validateBackup({backupFormat:BACKUP_FORMAT,backupVersion:BACKUP_VERSION,data:d});}'))
             self.page.locator('#next').click()
             self.page.wait_for_function('currentSession.phase==="complete" || (quizReady&&phase==="question")')
-        self.assertIn('20もんちゅう 20もん せいかい',self.page.locator('#study-result-summary').inner_text())
+        self.assertEqual(self.page.locator('#study-result-summary').inner_text(),'20もん ぜんぶ せいかい')
+        self.assertEqual(self.page.locator('#study-result-score').inner_text(),'100てん！')
         self.assertEqual(len(self.page.evaluate("readAll('answers')")),20)
         self.assertEqual(self.errors,[])
 
